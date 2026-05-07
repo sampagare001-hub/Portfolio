@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shamshon Pagare — Dual Portfolio</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Marck+Script&family=Baloo+2:wght@400;500;600&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  
+  <style>
+    /* ── RESET & BASE ──────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* Writer Theme */
+      --diary-blue: #080d1a;
+      --gold:       #C9A84C;
+      --gold-dim:   #7a5f28;
+      --paper-bg:   #f4efd3;
+      --ink-dark:   #1a1c23;
+      --ink-light:  #3a3c4a;
+
+      /* Designer Theme */
+      --gd-bg:      #fcfcfd;
+      --gd-text:    #111116;
+      --gd-muted:   #666677;
+      --gd-accent:  #00E5FF;
+      --gd-accent2: #FF007A;
+      
+      --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-size: 18px;
+      line-height: 1.75;
+      overflow-x: hidden;
+      margin: 0;
+      text-align: left;
+      cursor: none; 
+    }
+
+    a, button, .cover-half, iframe { cursor: none; }
+
+    /* ── CUSTOM CURSOR ──────────────────────────────────────── */
+    #cursor { 
+      position: fixed; pointer-events: none; z-index: 9999; top: 0; left: 0; 
+      transform: translate(-50%, -50%); transition: transform 0.08s ease; 
+      width: 32px; height: 32px; 
+    }
+    #cursor-dot { 
+      position: fixed; pointer-events: none; z-index: 9998; 
+      width: 6px; height: 6px; border-radius: 50%; top: 0; left: 0; 
+      transform: translate(-50%, -50%); transition: transform 0.04s ease, opacity 0.3s ease; 
+      background: #fff;
+    }
+
+    /* ── HUB (THE COVERS) ───────────────────────────────────── */
+    #hub-container {
+      position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 100;
+      display: flex; transition: opacity 0.5s;
+    }
+
+    .cover-half {
+      position: absolute; top: 0; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: width 0.8s var(--ease), transform 0.8s var(--ease), opacity 0.5s;
+      overflow: hidden;
+    }
+
+    #cover-writer {
+      left: 0; width: 50vw;
+      background-color: var(--diary-blue);
+      background-image: 
+        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%),
+        url("data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.2'/%3E%3C/svg%3E");
+      border-right: 2px solid rgba(201,168,76,0.3);
+      z-index: 10;
+    }
+    
+    #cover-gd {
+      right: 0; width: 50vw;
+      background-color: var(--gd-bg);
+      background-image: radial-gradient(circle at top right, rgba(0, 229, 255, 0.1) 0%, transparent 60%);
+      border-left: 1px solid rgba(0,0,0,0.05);
+      z-index: 10;
+    }
+
+    .cover-content { text-align: center; transition: transform 0.5s var(--ease); pointer-events: none; }
+    .cover-half:hover .cover-content { transform: scale(1.05); }
+    
+    .title-w { font-family: 'Cormorant Garamond', serif; font-size: 4rem; color: var(--gold); font-weight: 300; letter-spacing: 0.1em; }
+    .sub-w { font-family: 'Cormorant Garamond', serif; color: rgba(255,255,255,0.5); font-style: italic; margin-top: 10px; }
+    
+    .title-g { font-family: 'Space Grotesk', sans-serif; font-size: 4rem; font-weight: 700; color: var(--gd-text); letter-spacing: -0.05em; }
+    .sub-g { font-family: 'Space Grotesk', sans-serif; color: var(--gd-muted); margin-top: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem; }
+
+    /* GD Stickers */
+    .sticker { position: absolute; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); pointer-events: none; opacity: 0.8;}
+    .s1 { top: 20%; left: 15%; width: 60px; transform: rotate(-15deg); }
+    .s2 { bottom: 25%; right: 20%; width: 80px; transform: rotate(20deg); }
+    .s3 { top: 30%; right: 25%; width: 40px; }
+
+    /* ── INNER VIEWS (Under the Covers) ─────────────────────── */
+    .inner-view {
+      position: fixed; inset: 0; width: 100vw; height: 100vh; overflow-y: auto; overflow-x: hidden;
+      opacity: 0; pointer-events: none; transition: opacity 0.5s; z-index: 50;
+      text-align: left;
+    }
+    .inner-view.active { opacity: 1; pointer-events: auto; transition-delay: 0.4s; }
+
+    /* --- WRITER CONTENT (Paper & Handwriting) --- */
+    #view-writer {
+      background-color: var(--paper-bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      color: var(--ink-dark);
+      font-family: 'Marck Script', cursive; 
+    }
+    #view-writer::before {
+      content: ''; position: fixed; top: 0; left: 8vw; width: 2px; height: 100vh;
+      background: rgba(200, 50, 50, 0.2); pointer-events: none; z-index: 0;
+    }
+
+    .w-wrapper { max-width: 100%; margin: 0; padding: 100px 8vw 100px calc(8vw + 40px); position: relative; z-index: 2; }
+    
+    .w-h1 { font-size: 4.8rem; line-height: 1.1; margin-bottom: 20px; color: var(--ink-dark); font-weight: 400; transform: rotate(-2deg); transform-origin: left;}
+    .w-h2 { font-size: 3.2rem; margin: 60px 0 20px; color: var(--ink-dark); font-weight: 400; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 10px; }
+    .w-p { font-size: 2rem; line-height: 1.5; margin-bottom: 20px; color: var(--ink-light); }
+    
+    .w-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 30px; }
+    .w-card { background: rgba(0,0,0,0.03); padding: 24px; border-radius: 8px; border: 1px dashed rgba(0,0,0,0.1); position: relative;}
+    .w-card h3 { font-size: 2.2rem; margin-bottom: 5px; color: var(--ink-dark); }
+    
+    .btn-group { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;}
+    .read-btn {
+      display: inline-block; padding: 8px 20px;
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--gold-dim); border: 1px solid var(--gold-dim); border-radius: 4px;
+      background: transparent; transition: all 0.3s; text-decoration: none;
+    }
+    .read-btn:hover { background: var(--gold-dim); color: var(--paper-bg); }
+
+    /* ── EMBEDDED MODALS ─────────────────── */
+    .embedded-modal {
+      position: absolute; top: 0; left: 0; width: 100%; min-height: 100%;
+      background-color: var(--paper-bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      z-index: 100; transform: translateY(100%); transition: transform 0.6s var(--ease);
+      padding-bottom: 100px; display: none;
+    }
+    .embedded-modal.open { transform: translateY(0); display: block; }
+
+    .modal-close-btn {
+      position: sticky; top: 30px; left: calc(100% - 150px); z-index: 101;
+      font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 0.9rem;
+      color: var(--ink-dark); text-decoration: none; padding: 10px 20px; border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 30px; background: rgba(244, 239, 211, 0.9); transition: all 0.3s;
+      display: inline-block; margin-bottom: -50px; float: right;
+    }
+    .modal-close-btn:hover { background: var(--ink-dark); color: #fff; }
+
+    .section-divider {
+      width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(122, 95, 40, 0.4), transparent);
+      margin: 60px 0 50px 0;
+    }
+
+    .modal-intro { font-family: 'Marck Script', cursive; font-size: 2.2rem; color: var(--ink-light); margin-bottom: 25px; text-align: left; line-height: 1.5; max-width: 100%;}
+    
+    .poem-block { padding-left: 20px; border-left: 2px solid var(--gold-dim); max-width: 800px; margin-bottom: 60px;}
+    .poem-title-modal { font-family: 'Baloo 2', sans-serif; font-size: 1.8rem; font-weight: 600; color: var(--gold-dim); margin-bottom: 15px; }
+    .poem-body { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; font-weight: 500; color: var(--ink-dark); white-space: pre-wrap; line-height: 1.8; }
+
+    .article-block { max-width: 900px; margin-bottom: 80px; }
+    .article-title-en { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 600; color: var(--ink-dark); margin-bottom: 15px; line-height: 1.2; }
+    .article-body-en { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; color: var(--ink-dark); line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap; }
+    
+    .article-title-mr { font-family: 'Baloo 2', sans-serif; font-size: 2rem; font-weight: 600; color: var(--ink-dark); margin-bottom: 15px; line-height: 1.2; }
+    .article-body-mr { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; font-weight: 400; color: var(--ink-dark); line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap; }
+
+    /* --- DESIGNER CONTENT (Canvas) --- */
+    #view-gd {
+      background-color: var(--gd-bg);
+      background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px);
+      color: var(--gd-text);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .g-wrapper { max-width: 100%; margin: 0; padding: 100px 8vw 100px 8vw; }
+    .g-h1 { font-size: clamp(3rem, 5vw, 5rem); font-weight: 700; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.04em; }
+    .g-h2 { font-size: 2.5rem; font-weight: 700; margin: 80px 0 30px; letter-spacing: -0.02em; }
+    .g-h3 { font-size: 1.5rem; font-weight: 600; margin: 50px 0 20px; color: var(--gd-accent); letter-spacing: 0.05em; text-transform: uppercase;}
+    .g-p { font-size: 1.2rem; color: var(--gd-muted); line-height: 1.6; margin-bottom: 20px; max-width: 800px; }
+    
+    .g-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 20px; }
+    .g-card { background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);}
+    .g-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,229,255,0.1); }
+    .g-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
+    .g-card p { font-size: 1rem; color: var(--gd-muted); }
+
+    /* Premium Drive Folder Link Card */
+    .drive-card {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(17, 17, 22, 0.95);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 16px; padding: 40px; margin-top: 30px;
+      text-decoration: none; position: relative; overflow: hidden;
+      transition: all 0.4s var(--ease);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      max-width: 900px;
+    }
+    .drive-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(0, 229, 255, 0.6);
+      box-shadow: 0 20px 40px rgba(0, 229, 255, 0.15);
+    }
+    .drive-card-content { display: flex; align-items: center; gap: 20px; z-index: 2; }
+    .drive-icon { width: 45px; height: 45px; color: var(--gd-accent); }
+    .drive-text h3 { color: #fff; font-size: 1.6rem; margin: 0 0 5px 0; font-weight: 700; font-family: 'Space Grotesk', sans-serif;}
+    .drive-text p { color: var(--gd-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin: 0; }
+    .drive-arrow { color: var(--gd-accent); font-size: 2rem; transition: transform 0.4s; z-index: 2; }
+    .drive-card:hover .drive-arrow { transform: translateX(10px); }
+    .drive-glow {
+      position: absolute; top: 0; right: 0; width: 300px; height: 100%;
+      background: radial-gradient(circle at right, rgba(0,229,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Video Embeds */
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px; }
+    .video-card { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.08); background: #000; transition: transform 0.4s var(--ease); }
+    .video-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,229,255,0.2); }
+    .video-card video { width: 100%; height: 280px; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.4s; }
+    .video-card:hover video { opacity: 1; }
+    .video-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 30px 25px; background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4), transparent); color: #fff; pointer-events: none;}
+    .video-info h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; color: #fff; }
+
+    /* Clean Scroll Reveal Animations */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Home Button */
+    .home-btn {
+      position: fixed; top: 30px; right: 40px; z-index: 600;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.9rem;
+      color: #000; text-decoration: none; padding: 10px 20px; border: 2px solid rgba(0,0,0,0.2);
+      border-radius: 30px; opacity: 0; pointer-events: none; transition: all 0.3s;
+      background: rgba(255,255,255,0.8);
+    }
+    .home-btn:hover { background: #000; color: #fff; border-color: #000; }
+    .home-btn.visible { opacity: 1; pointer-events: auto; }
+
+  </style>
+</head>
+<body>
+
+  <div id="cursor">
+    <svg id="cur-writer" viewBox="0 0 32 32" fill="none" style="position: absolute; opacity: 0; transition: opacity 0.3s ease;">
+      <path d="M8 26L6 30L10 28L26 8L22 4L8 26Z" fill="#C9A84C" stroke="#E2C97E" stroke-width="0.6"/>
+      <path d="M6 30L7.5 27L9 28.5L6 30Z" fill="#7a5f28"/>
+      <rect x="22.5" y="1.5" width="4" height="4" transform="rotate(45 22.5 1.5)" fill="#E2C97E" stroke="#C9A84C" stroke-width="0.5"/>
+    </svg>
+    <svg id="cur-gd" viewBox="0 0 32 32" fill="none" style="position: absolute; opacity: 0; transition: opacity 0.3s ease;">
+      <path d="M12 20 L4 28 L10 28 L28 10 L22 4 Z" fill="#00E5FF" stroke="#000" stroke-width="0.5"/>
+    </svg>
+  </div>
+  <div id="cursor-dot"></div>
+
+  <a href="#" class="home-btn" id="home-btn" onclick="resetToHub(event)">⌂ CLOSE PORTFOLIO</a>
+
+  <div id="hub-container">
+    <div id="cover-writer" class="cover-half" onclick="openPortfolio('writer')">
+      <div class="cover-content">
+        <h2 class="title-w">Writer</h2>
+        <p class="sub-w">The Diary</p>
+      </div>
+    </div>
+
+    <div id="cover-gd" class="cover-half" onclick="openPortfolio('gd')">
+      <svg class="sticker s1" viewBox="0 0 100 100" fill="#FF007A"><path d="M50 0 L60 35 L95 35 L65 55 L75 90 L50 70 L25 90 L35 55 L5 35 L40 35 Z"/></svg>
+      <svg class="sticker s2" viewBox="0 0 100 100" fill="none" stroke="#00E5FF" stroke-width="8"><circle cx="50" cy="50" r="40"/></svg>
+      <svg class="sticker s3" viewBox="0 0 100 100" fill="#111116"><circle cx="20" cy="20" r="10"/><circle cx="80" cy="20" r="10"/><circle cx="20" cy="80" r="10"/><circle cx="80" cy="80" r="10"/></svg>
+      
+      <div class="cover-content">
+        <h2 class="title-g">Designer</h2>
+        <p class="sub-g">The Sketchbook</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-writer" class="inner-view">
+    
+    <div class="w-wrapper" id="main-writer-content">
+      <h1 class="w-h1 reveal">Shamshon Pagare</h1>
+      <p class="w-p reveal">Words crafted across languages — English, Marathi, Urdu, Hindi — each one a thread in the fabric of story.</p>
+      
+      <h2 class="w-h2 reveal">About Me</h2>
+      <p class="w-p reveal">I am a Mumbai-based writer with over six years of professional experience spanning creative essays, poetry, shayari, and scripts. My work moves fluidly between languages — finding lyrical precision in Urdu, narrative depth in Marathi, and editorial clarity in English.</p>
+
+      <h2 class="w-h2 reveal">What I Write</h2>
+      <div class="w-grid reveal">
+        <div class="w-card">
+          <h3>Poetry & Shayari</h3>
+          <p class="w-p" style="font-size:1.6rem; margin-bottom: 0;">Original verse in Urdu and Hindi — romantic, lyrical, rooted in classical tradition.</p>
+          <div class="btn-group">
+            <button class="read-btn" onclick="openModal('poems-modal')">Read Poems</button>
+          </div>
+        </div>
+        
+        <div class="w-card">
+          <h3>Essays & Articles</h3>
+          <p class="w-p" style="font-size:1.6rem; margin-bottom: 0;">Long-form writing on culture, identity, art, and the textures of everyday life.</p>
+          <div class="btn-group">
+            <button class="read-btn" onclick="openModal('articles-modal')">Read Articles</button>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="w-h2 reveal">Let's Collaborate</h2>
+      <p class="w-p reveal">Available for essays, brand copy, lyrics, scripts, and editorial assignments. I write with care — and I always meet a deadline.</p>
+      <p class="w-p reveal" style="font-weight: bold; font-family: 'Cormorant Garamond', serif;">sampagare001@gmail.com</p>
+    </div>
+
+    <div id="poems-modal" class="embedded-modal">
+      <div class="w-wrapper" style="padding-top: 60px;">
+        <button class="modal-close-btn" onclick="closeModal('poems-modal')">↓ Back to Profile</button>
+        <h1 class="w-h1" style="font-size: 4rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; margin-bottom: 40px; transform: none;">The Poetry Collection</h1>
+        
+        <p class="modal-intro">These poems did not begin as poems.</p>
+        <p class="modal-intro">They began as feelings I could not explain at dinner tables. As thoughts that arrived at 2am uninvited, settled into the mattress beside me, and refused to leave by morning. As the strange, stubborn weight of ordinary moments that somehow refused to stay ordinary — a cup of tea going cold, a name I almost said out loud, a window I stood at for too long without knowing why.</p>
+        <p class="modal-intro">I am not the kind of writer who sits down and decides to write a poem. I am the kind who carries something wordless around for days, sometimes weeks, until it becomes too heavy to carry silently. Until the only way to set it down is to find the exact right words for it — and then break those words into lines, because somehow a line break says what a comma cannot.</p>
+        <p class="modal-intro">Poetry, for me, is not decoration. It is excavation.</p>
+        <p class="modal-intro">It is going back to the moments I walked past too quickly and asking — what was really happening there? It is giving language to the feelings that lived just beneath the surface of ordinary days, unnoticed and unnamed, quietly shaping everything.</p>
+        <p class="modal-intro">These poems were written in the margins of a busy life. On phone notes at traffic signals. In the ten minutes before sleep arrived. In the aftermath of conversations that ended before they were finished. They are not polished monuments. They are honest records — of longing, of noticing, of trying to make sense of what it means to be a person moving through a world that rarely pauses long enough to ask how you are, and means it.</p>
+        <p class="modal-intro">I don't know what you will find in these pages. That is the strange and beautiful thing about poems — the reader always finds something the writer did not put there. A word lands differently in your chest than it did in mine. A line means something to you that I never intended and could not have predicted. And that unexpected meeting — between what I meant and what you needed — is, I think, the whole point.</p>
+        <p class="modal-intro">But if one line catches somewhere inside you and quietly refuses to let go — that's the one that was always meant for you. Long before you found it. Long before I found the words.</p>
+
+        <div class="section-divider"></div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">1. आसमान की बंदीशें</div>
+          <div class="poem-body">वो आँखें गड़ाये बैठी है उन तारों की ओर,
+उम्मीद थी के कोई तारा टूट कर झोली में गिरे तो छुपा के रख लूँगी।
+गर याद आये किसी दिन चाँद की देर रात,
+तो हथेली पर रख के टूटे तारे को देख लूँगी!
+
+इक तारा दूर से आवाज़ देके कहता है...
+याद है उस रात जब सय्यारों के गर्दिशों के मंज़र रुक से गए थे,
+तुमने नज़रों से सय्यारों को बाँध के रखा था,
+कुछ तारे मगर तुम्हारे आँखों में छलक कर बह भी गए थे!
+
+हर तारे ने एक कहानी बताई तुम्हारे बचपन की मगर,
+कोई कहानी तुम्हें वहाँ रास न आई।
+तुम बुलाती रही उस चाँदनी को अपनी ओर,
+वो ज़ालिम मगर पल भर भी तुम्हारे पास न आई!
+
+वो... एक छोर आसमान का गिरने लगा सामने तुम्हारे,
+मंज़र था डूबते सूरज का जब तुम इक झूले पे बैठे अपने तन्हाई के शोर को उन लहरों की आवाज़ में छुपा रही थी।
+हाँ.. मुस्कान दिखी तुम्हारे होंठों पर तभी,
+यह वही मंज़र था जिसे तुम सय्यारों की गर्दिशों में सजा रही थी!
+
+उस रात आसमान ने अपनी बंदिशें तोड़ दी!</div>
+        </div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">2. पिया मोहे काहे सताये</div>
+          <div class="poem-body">एक तरफ सूरज ढल ही रहा है,
+एक तरफ वो अपने आँगन में बैठे इंतज़ार करती रही।
+रात थी पूनम की और चाँद फ़लक पे सजा था,
+वो चाँदनी से भीगे आँगन में बैठे कहती रही...
+
+"पिया मोहे काहे सताये,
+बतिया तोरे इंतज़ार की का सुनाये।
+काटू न काटे यह दिन यह रैना,
+आजा पिया काहे सताये!
+तोसे वास्ता रखे दिल पछताये,
+तन्हाई की घड़ी सही न जाये,
+तरस गए पी यह नैन मोरे,
+अब आजा पिया काहे सताये!"
+
+कमाल करती है वो भी...,
+संग हो तो आँचल का पर्दा कभी रुख से हटता ही नहीं,
+शाम ढले तो उनका वक़्त,
+पिया बिन कभी कटता भी नहीं!</div>
+        </div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">3. कल की रात तेरे बिन कटी!</div>
+          <div class="poem-body">रुक तो गई थी साँसें कुछ पल के लिए,
+बेबसी के अरमान भी कुछ धुल से गए थे।
+याद आया जब देखा तुमको उस राह के किनारे,
+हम तब साँसें लेना भी कुछ भूल से गए थे!
+
+मैं उतरा अपनी गाड़ी से और चलने लगा तुम्हारे पीछे,
+तुम बस अपनी ज़ुल्फ़ें झुड़काये आगे दूरी बनाती रही।
+मैं चाहता था के पास आके महसूस करूँ तुम्हारी वो नई ख़ुश्बू,
+मगर तुम बस कुछ दूरी बनाये हमें मजबूरी सुनाती रही!
+
+तुमने कई बातें बताई थी उस रात भी,
+हम पल भर मगर आँखें तुमसे हटा न सके।
+जी तो कर रहा था के जकड़ लूँ ज़ुल्फ़ें तुम्हारी जब तुमने उन्हें खोला था,
+मगर दिल के अरमान भी महज़ तुम्हें हम बता न सके!
+
+अजीब सा मंज़र था वो,
+तुम बस दूरी बनाये खड़ी रही।
+एक क़िस्सा लेके आया था मैं ज़ेहन में अपने,
+वो दास्तान भी मगर किसी कोने में पड़ी रही!
+
+दोनों उलझे से थे अपने जज़्बातों में,
+मुझे डर था कि वो हमारे अरमान बस बिन पढ़े फेंक न दे...
+वो सहमी थी मगर भीड़ से,
+उसको डर था के हमें कोई साथ देख न ले!
+
+तुम्हें फ़ुर्सत नहीं थी के हमें ज़रा गले से लगाये,
+हम ख़ुश थे मगर कि तुमने पल भर तो हमसे नज़रें मिलाई।
+तुम बिताती रही वक़्त लोगों के बीच मगर,
+वो रात मैंने तुम्हारे इंतज़ार में ही बिताई!
+
+कल की रात तेरे बिन कटी!</div>
+        </div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">4. फ़ुर्सत थी! रात थी! तन्हाई थी! और दर्द भी!</div>
+          <div class="poem-body">फ़ुर्सत थी! रात थी! तन्हाई थी! और दर्द भी!
+एक दर्द को उतारा सोच से और बिठा दिया पास में।
+पूछा मैंने किस वजह से ठहरे हो ज़ेहन में?
+कहने लगा कि रुका हूँ बस उनके मिलने की आस में!
+
+हैरत है, वो चुप सी होकर बैठी थी अपने में ही,
+हम ताकते रहे उस मुरझाये मुखड़े को फ़ुर्सत से।
+कह रही थी के उलझी हूँ कई ख़यालों में कई सोचों में,
+ठीक नहीं लगी वो अपनी किसी हरकत से!
+
+और मैं यहाँ बैठा रहा के वो आये तो पूछ लूँ,
+बताओ..., है अगर कोई शिकायत मुझसे तो सुलझा दूँ तकलीफ़ें सारी?
+उदास ठीक नहीं लगते आप हमें...
+ख़ुश नहीं हो तो बताओ मैं पलट दूँ तुम्हारी तक़दीरें सारी?
+
+वो साहिल पे बैठे उस रात बस चाँद से नज़रें मिला रही थी,
+सामने रात की लहरों का शोर कानों में गूँज रहा था।
+वो बातें करती रही बस खुद से ही...,
+और मैं पास बैठे बस उसकी ख़ामोशी को सुन रहा था!
+
+तेरी आँखें... तेरी नादान सी उलझी हुई आँखें!
+तेरी आँखों में तेरे ज़ेहन का मंज़र दिखाई दे रहा था।
+तुम उलझी थी ख़ामोशी से अपने ख़यालों में...
+तेरी झुकती पलकों से तेरे ज़ेहन का शोर सुनाई दे रहा था!
+
+कैसे पूछूँ तुझसे, क्या है वो उलझन तुम्हारी...
+पास होती तो माथे से चूम कर सारी उदासी गिरा देता।
+गालों पे रख कर हाथ अपने,
+अपनी गोद में तुझे सुला भी देता!
+
+तेरी ज़ुल्फ़ों में फेरता मैं हाथ अपने,
+तेरी हथेली को शिद्दत से पकड़ लेता।
+ज़रा प्यार से सेहलाता गालों को तेरे,
+धीमे से बाहों में जकड़ लेता!
+
+तेरे जिस्म की ख़ुश्बू को उतार लेता अपने कपड़ों पर,
+तेरे चेहरे का नूर रख लेता गालों पे अपने।
+तू भूल जाती वो ग़म वो दर्द वो सारी बातें,
+तुझे चुरा के अगर रख लेता मैं बाहों में अपने!
+
+बैठा हूँ अब भी तेरी राह देखते तेरे ही पास,
+तुझे फ़ुर्सत मिले तो चाँद से निगाहें तोड़ लेना।
+काट के डाल देना उन बासी पन्नों को गरजते समंदर में,
+कश्ती अगर डगमगाने लगे तो हमारी तरफ़ उसे मोड़ लेना।</div>
+        </div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">5. एक याद ख़ामोश सी...</div>
+          <div class="poem-body">भर सुनता रहा जो बूँद बूँद बरस रही थी चाँदनी,
+तुम्हारी साँसों की आहट ख़ामोश झील सी महसूस हुई।
+तुम्हारी ज़ुल्फ़ों से हथेली को तुम्हारे रुख़सार तक सरकाये,
+हमने वो रक़्स छेड़ा के गरजते बादलों की महफ़िल भी ख़ामोश हुई!
+
+उस रात मैंने काफ़ी देर तक तुम्हारी आँखें सँवारी,
+हैरान था के छुप गई थी मगर पलकों तले भी बड़ी ख़ूब दिख रही थी आँखें।
+एक दिये के उजाले में मैं तुम्हें ताकता रहा,
+और मेरे होंठों के नूर में सारी रात भीग रही थी आँखें!
+
+याद है किस तरह तुम ख़ामोश सोती रही इक पहलू में,
+और मैंने चुपके से तुम्हारे रुख़ से ज़ुल्फ़ें हटाने के बहाने तुम्हारे होंठों को छुआ था?
+तुम नींद में कुछ जान भी नहीं पाई मगर,
+कैसे बताऊँ तुम्हारे लबों के सुर्ख़ लम्स से मुझे उस रात कुछ हुआ था!
+
+तेरी आँखें... तेरी बेज़ुबान ख़ामोश सी आँखें,
+तेरी आँखें हैं या झरोखे से उतरता चाँद का वो नूर।
+तेरी आँखों में देखे गुज़ारी वो रैन सारी,
+और रात भर तोड़ा था तुमने बरसती चाँदनी का ग़ुरूर!
+
+अर्ज़ करते हैं जो कभी ख़्वाबों में हमें नसीब हुई,
+वो ख़्वाबों की रात तुम्हारे सीने पे सुला दो।
+जो रात हमने गुज़ारी तुम्हारी बाहों में जाग कर,
+वो रात मुझे लौटा दो!</div>
+        </div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">6. मेरे चेहरे पे तेरी हथेली का लम्स कुछ ऐसे छलक रहा है</div>
+          <div class="poem-body">मेरे चेहरे पे तेरी हथेली का लम्स कुछ ऐसे छलक रहा है,
+जैसे गहरी रात में एक झील पे सफ़ेद चाँद बरस रहा हो।
+और मेरे लबों पे लगी तेरे होंठों की वो मोहर
+कुछ ऐसे छलकी है जैसे शाम को गोद में लिये चाँद सय्यारे के दीदार को तरस रहा हो!
+
+यह कमबख़्त आँखों की जो ज़िद्द है...,
+तेरी निगाहों पे ठहरे तो थम जाती है नज़रों की तलाश।
+जी चाहता है तेरी ज़ुल्फ़ों में सजाऊँ फूल मोहब्बत के,
+जकड़ लूँ बाहों में, मगर तू थोड़ी क़रीब होती काश!
+
+तेरी आँखें... तेरी उलझी हुई नादान सी आँखें,
+तेरी आँखों में देख कर सँवरती है रात।
+तू आँखें गड़ाये जो बैठ जाये झील पे,
+क़तरा क़तरा उस झील पे तब बरसती है रात!
+
+तेरी आँखों में अपनी नज़रें रुकाये जब हम बैठे रहे सारी रात,
+हमने बूँद बूँद लम्हों को पिघलते देखा।
+वो बेबस लम्हे ठहरे रहे तेरे रुख़ पर,
+तेरी साँसों में हमने ख़ुदको जलते देखा!
+
+मेरे तकिये पे तेरे चेहरे का लम्स अभी तक छलक रहा है,
+हथेली से छू कर तकिये को हम तेरे क़िस्से सुनाते हैं।
+तेरे जिस्म की ख़ुश्बू खो गई वक़्त के दरिया में,
+दिल कुछ पूछे तो बस बहाने बनाते हैं!
+
+मैं सोता हूँ अक्सर तेरी याद को सीने से लगाये,
+रात ज़ालिम है मगर तेरे सिवा कटती भी नहीं।
+और नज़रों में बसी तेरी आँखों की वो याद,
+पलकें भी झुकाऊँ मगर आँखों से कभी हटती ही नहीं!
+
+तुम जब मुस्कुरा कर मिलाती हो नज़रें हमसे,
+एहसास होता है ज़िंदगी इतनी बुरी भी नहीं।
+तेरी आँखों से अक्सर ज़ख़्मों को भरना चाहा हमने,
+वो गहरे ज़ख़्म मगर कभी भरे भी नहीं!
+
+याद है जब उस कोने में बैठे तुमने पलकें उठाईं और मैं बस देख रहा था तुमको?
+तुमने शरमा कर अपनी पलकें झुका ली थीं।
+मैं देखता रहा तुमको यूँही नज़रें गड़ाये,
+ज़ेहन में कहीं तेरे दीदार की याद बसा ली थी!
+
+तेरा नज़रें झुकाये वो मुस्कुराना,
+हमें बेचैन सा किये जा रहा था।
+हम ख़ामोशी से तुम्हें देखते रहे,
+और सीने में कोई दर्द करवट पलट रहा था!
+
+अब मजबूरी तो देखिये, तू सामने होकर भी दिन गुज़ारे तेरी तस्वीर को देख कर,
+शिकायत तो है मगर कहें क्या तक़दीर से?
+तब तो आँखें भी यह पूछने लगी थीं...
+जनाब, आपको इश्क़ उनसे है या उनकी तस्वीर से?
+
+अफ़सोस है, तुझे देखूँ तो साँसें यूँ सुलगने लगती हैं,
+जैसे तेरी आँखों ने दिल में कहीं शमा जलाई हो।
+और तू मुस्कुराये तो यूँ गूँजती है धड़कन,
+जैसे तुमने सीने में छुपी कोई याद जगाई हो!
+
+अब शाम का वक़्त है और तेरी याद में,
+दिये बुझाये बैठे हैं हम खिड़की के तले।
+भीगते रहे अरमान आँसुओं में मगर,
+भीगे जज़्बात अब किसकी आग में जलें!</div>
+        </div>
+
+        <div class="poem-block">
+          <div class="poem-title-modal">8. प्रिय फूल</div>
+          <div class="poem-body">रे माझ्या फुला तू
+येऊन भेट मला तू
+तुझ्या सुवासाची दरवळ
+तुझ्या रंगाची उधळण
+मनाला भुरळ घालते
+तुझ्या भेटीची ओढ लागते
+कधी येशील तू सांग ना
+माझ्या मनाला तू लाग ना
+
+तुझ्याच डोळ्यांत पाहिले
+नशिबातले चांदणे,
+दिवसा चे किस्से तुझे
+हसून मला सांगणे!
+
+हा चंद्र बसला आज जोडीला माझ्या
+तरी चांदणी बाहेर येईना,
+चिडलो मनावर किती वेळा मात्र
+आठवण तुझी काही जाईना!
+
+बसुन राहीलो त्या नदीकाठी
+पाण्यातही चेहरा तुझाच दिसला,
+पाहिले मला त्याने गुणगुणताना
+नी पाण्यात पाहून हळूच हसला!
+
+तो थांबला, तो बसला
+माझ्या डोळ्यातलं पाणी बघून गेला,
+ते अश्रू त्याने ओंजळीत भरले
+अन धरून वार्‍याला निघून गेला!
+
+त्या एकट्या पडलेल्या रात्रीच्या अंधारात
+कापसाचे बोळे पळत राहीले,
+अणि डोळ्यातल्या पाण्याला वात बनवून
+पापण्यातले दिवे जळत राहीले!
+
+तू हरवली आहेस तुला शोधू तरी कुठं
+मन जखमी आहे वेदना साठवु तरी कुठं,
+इकडे कोपर्‍या-कोपर्‍यात आवाज तुझा
+तुला विसरलो ही नाही तुला आठवू तरी कुठं!
+
+या चांदण्यांच्या गर्दीत पाहिले मी तुला
+पण रात्र मला ती आवडली नाही,
+जुन्या धाग्यात गुंतलेले ते हात
+तू आलीस, पण मला मात्र सापडली नाही!</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="articles-modal" class="embedded-modal">
+      <div class="w-wrapper" style="padding-top: 60px;">
+        <button class="modal-close-btn" onclick="closeModal('articles-modal')">↓ Back to Profile</button>
+        
+        <h1 class="w-h1" style="font-size: 4rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; margin-bottom: 40px; transform: none;">Articles & Essays</h1>
+        
+        <p class="modal-intro">I write about the strange, tender, and often unspoken corners of human experience — for readers who think a little too much and feel a little too deeply. My work spans longform essays, cultural commentary, and copy that carries a soul.</p>
+        <p class="modal-intro">I'm drawn to the questions nobody asks out loud. The ones that live in the pause between sentences, in the middle of ordinary Tuesdays, in the feeling you can't quite name but recognise the moment someone else names it first. That's where I write from. And if you've ever put down a piece of writing and felt, just briefly, less alone in the world — that's exactly what I'm reaching for.</p>
+        <p class="modal-intro">Over six years, I've written across personal Poetry, Scripts, Short Stories, culture, and brand storytelling. The topics change. The intent doesn't: to make the reader feel that someone, somewhere, was paying close enough attention to put it into words.</p>
+
+        <div class="section-divider"></div>
+
+        <div class="article-block">
+          <div class="article-title-en">1. The Loneliness of Being Understood</div>
+          <div class="article-body-en">She finally said, "I know exactly what you mean" — and something in me quietly closed a door.
+
+I've thought about that moment for years. We were sitting across from each other at a small table, the kind that forces a certain uncomfortable intimacy, our coffees going cold between us. She had just finished my sentence — not approximately, not in the ballpark, but exactly. Word for word, the thought I had been circling for twenty minutes, she plucked cleanly from the air and handed back to me.
+
+It should have felt like coming home.
+
+It felt, instead, like standing in a house that looked exactly like home — same curtains, same creaking floorboard, same smell of something familiar — and realising, with a chill you can't explain, that you've never been here before.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-en">2. The Promise We Were Given</div>
+          <div class="article-body-en">From the time we are old enough to feel lonely — which is earlier than anyone admits — we are handed a story. The story goes like this: You are alone because you are not yet understood. Find someone who gets you. That is the cure.
+
+We believe it with our whole selves. We spend our twenties writing journal entries that are really auditions. We overshare on first dates, in new friendships, in 2am text messages we almost-but-don't-quite delete before sending. We make art, pour our humiliations into essays, read poetry aloud to people who might finally, finally see.
+
+All of it, every brave and embarrassing bit of it, is reaching. Reaching for that singular moment of recognition. That yes. That me too. That quiet miracle of a person looking at the most complicated, unlovely, difficult-to-explain parts of you and saying — without flinching — I know.
+
+We are told, and we believe, that this is the destination.
+
+Nobody warns us about what happens when we arrive.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-en">3. The Shock of Arrival</div>
+          <div class="article-body-en">It does happen. That's the thing — it genuinely does.
+
+There are people who understand you. Not perfectly, not entirely, but in the ways that matter. A friend who knows which silence means you're fine and which one means you're drowning. A partner who doesn't need you to finish the sentence. A stranger on the internet who wrote something that described your inner life so precisely you had to put your phone down and press your hands flat against the table just to feel real.
+
+And in that moment of being understood — there is relief. Profound, almost physical relief. Like setting down something heavy you'd forgotten you were carrying.
+
+But then, if you stay with it a little longer. If you sit quietly with the feeling instead of celebrating it —
+
+There it is.
+
+Something that has no clean name. A soft, bewildering ache that arrives not despite being understood, but somehow because of it.
+
+The loneliness doesn't leave. It just changes shape.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-en">4. Why the Distance Remains</div>
+          <div class="article-body-en">Here is what I've come to believe: understanding is a bridge, not a merger.
+
+When someone understands you, they are building something toward you — with great care, with real love, with extraordinary attention. And you can meet them on that bridge. You can stand together in the middle of it, above the water, and feel the warmth of being seen.
+
+But you cannot become each other. The bridge is not the shore.
+
+No matter how precisely someone names your experience, they are still naming it from the outside. They are translating. And every translation, however beautiful, however close — is still a translation. Something always lives in the original language that cannot fully cross.
+
+This is not a failure of love. It is not a failure of effort or attention or intimacy. It is simply the permanent, aching condition of being a self. We are each, at bottom, a private universe. And private universes can orbit each other, can pull each other, can illuminate each other across the dark — but they cannot occupy the same space.
+
+Being understood doesn't dissolve that. If anything, it makes the boundary clearer.
+
+Because now you can see exactly where you end and another person begins.
+
+And sometimes — not always, but sometimes — that line feels lonelier than the blur did.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-en">5. What Books Know That People Don't</div>
+          <div class="article-body-en">There is a specific loneliness that belongs only to finishing a book that understood you completely.
+
+You know the one. The book you found at exactly the right moment. The one that seemed to have been written about you, for you, possibly by you in some past life you don't remember. Every page felt like recognition. Every paragraph said the thing you'd been unable to say, thought the thought you'd been unable to think.
+
+You read it and you felt, for a few hours or a few days, profoundly accompanied.
+
+And then you closed it.
+
+And the feeling — the seen, understood, accompanied feeling — stayed in the book. It didn't follow you out. You made dinner, answered messages, lay in bed in the dark, and you were alone again, but somehow more acutely alone than before. Because now you knew the shape of what you were missing. The book had shown you the exact dimensions of the absence.
+
+This is why people reread beloved books compulsively. Not because they've forgotten what happens. But because they are trying to get back to that feeling of being accompanied — and finding, every time, that it lives on the page and not in the chest.
+
+Art understands us in ways people cannot. It is patient, it is available, it does not grow tired or distracted or hungry. It holds still while we look.
+
+But it cannot look back.
+
+And so the loneliness it cures and the loneliness it causes are, in the end, remarkably similar.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-en">6. The Grief of Being Seen Clearly</div>
+          <div class="article-body-en">There is another dimension to this — one that is harder to admit.
+
+When someone understands you truly, you also see yourself through their eyes. And that clarity, that sudden sharpness of self-perception, can be its own particular discomfort.
+
+Because most of us, most of the time, are slightly blurred to ourselves. We are the sum of our moods, our competing desires, our best intentions and worst habits, and we swim in all of it without too clean a picture. There is mercy in that blur. It makes us possible to ourselves.
+
+Being deeply understood can cut through it. Someone reflects you back with such precision that you see yourself whole, in focus, all at once.
+
+And you may not be entirely prepared for that.
+
+Not because what they see is bad — but because it is definite. And definite is, in its own quiet way, a kind of loss. The loss of all the selves you might have been. The closing of a certain pleasant ambiguity.
+
+To be known is also to be, in some small measure, fixed. Pinned. Real.
+
+And sometimes we were quite comfortable not being entirely real.</div>
+        </div>
+
+        <div class="article-line-break"></div>
+
+        <div class="article-block">
+          <div class="article-title-mr">7. मुंबई मध्यरात्री — गोंधळाला एक प्रेमपत्र</div>
+          <div class="article-body-mr">मुंबई तुम्हाला कधीच विचारत नाही — तू कोण आहेस? तू कुठून आलास? तुला काय हवंय?
+
+ती फक्त म्हणते — चाल.
+
+मध्यरात्री जेव्हा बाकी शहरं झोपतात, तेव्हा मुंबई नुकतीच जागी होते. लोकल ट्रेनचा आवाज, वडापावच्या टपरीवरचा धूर, समुद्राची खारी हवा — हे सगळं एकत्र येऊन एक असं जग तयार करतं जे थकलेल्या माणसालाही सांगतं, तू इथे आहेस, हे पुरेसं आहे.
+
+मी या शहरात आलो तेव्हा माझ्याकडे फक्त एक बॅग होती आणि बरेच प्रश्न होते. मुंबईने उत्तरे दिली नाहीत. पण तिने मला शिकवलं की प्रश्नांसोबत जगता येतं — धावत, घाम गाळत, लोकलमध्ये उभं राहत.
+
+इथल्या प्रत्येक गल्लीला एक आवाज आहे. प्रत्येक चौकाला एक आठवण आहे. आणि प्रत्येक मध्यरात्री ही शहर पुन्हा एकदा सिद्ध करतं — काही गोष्टी कधीच थांबत नाहीत, आणि ते थांबणं हेच त्यांचं सौंदर्य आहे.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-mr">8. ती थकली होती — पण तिला थकायची परवानगी नव्हती. (स्त्री आणि समाज)</div>
+          <div class="article-body-mr">सकाळी सहाला उठणं. स्वयंपाक. मुलांची तयारी. ऑफिस. संध्याकाळी परत घर. रात्री पुन्हा स्वयंपाक. झोपेआधी उद्याच्या यादीचा विचार.
+
+तिने कधी सांगितलं नाही की ती थकली आहे.
+
+कारण सांगितलं तर कोण ऐकणार? आणि ऐकलं तर कोण समजणार? आणि समजलं तर कोण बदलणार?
+
+आपण स्त्रियांना लहानपणापासून एक गोष्ट शिकवतो — सगळ्यांसाठी असणं. आईसाठी, बाबांसाठी, नवऱ्यासाठी, मुलांसाठी, सासरसाठी. स्वतःसाठी — ते यादीत कुठेतरी शेवटी असतं. आणि शेवट कधी येत नाही.
+
+थकणं हे कमजोरीचं लक्षण नाही. ते माणूस असण्याचं लक्षण आहे.
+
+तिला थकायची परवानगी आहे. रडायची परवानगी आहे. नाही म्हणायची परवानगी आहे. आणि सर्वात महत्त्वाचं — स्वतःसाठी जगायची परवानगी आहे.
+
+कोणाची वाट पाहू नका ती परवानगी द्यायची. ती परवानगी तुम्हीच तुम्हाला द्यायची असते.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-mr">9. मार्क्स म्हणजे तू नाहीस. (शिक्षण आणि स्वप्नं)</div>
+          <div class="article-body-mr">परीक्षेचा निकाल आला. आणि घरात एक शांतता पसरली — ज्या शांततेत खूप काही बोलणं होतं.
+
+त्या मुलाने खिडकीतून बाहेर पाहिलं. आकाश तेच होतं. झाडं तीच होती. फक्त त्याच्या डोळ्यांत एक प्रश्न होता — मी पुरेसा आहे का?
+
+आपण मुलांना खूप लवकर शिकवतो की यश म्हणजे संख्या असते. ९०% म्हणजे हुशार. ६०% म्हणजे सामान्य. आणि त्याखाली म्हणजे... काय?
+
+पण संख्या माणसाला मोजू शकत नाही.
+
+ज्याला गणित जमत नाही तो कदाचित उद्या सर्वात संवेदनशील लेखक होईल. ज्याला विज्ञान नको आहे तो कदाचित असा शेतकरी होईल जो मातीशी बोलतो. ज्याच्या उत्तरपत्रिकेत चुका आहेत त्याच्या मनात कदाचित असे प्रश्न आहेत जे अजून कोणाला पडले नाहीत.
+
+मार्क्स म्हणजे एक क्षण आहे. तू म्हणजे एक आयुष्य आहेस.
+
+ते दोन्ही एक नाहीत. कधीच नव्हते.</div>
+        </div>
+
+        <div class="article-block">
+          <div class="article-title-mr">10. स्वप्न आणि पगार यांच्यामधली रात्र</div>
+          <div class="article-body-mr">एक प्रश्न आहे जो प्रत्येक तरुण स्वतःला विचारतो — पण कोणाला सांगत नाही.
+
+मी जे करतो ते मला खरंच हवं आहे का?
+
+सकाळी नऊला ऑफिस. रात्री आठला घर. आणि मध्ये — काम, मीटिंग, डेडलाइन, आणि मधूनच एक रिकामी भावना जी सांगते की हे सगळं करताना मी कुठेतरी हरवत चाललोय.
+
+पगार मिळतो. पण समाधान?
+
+आपण करिअर निवडताना अनेकदा इतरांच्या अपेक्षा निवडतो. आईबाबांचं स्वप्न, समाजाची मान्यता, मित्रांची स्पर्धा — या सगळ्यांमध्ये आपलं स्वतःचं उत्तर कुठेतरी मागे पडतं.
+
+पण ती रात्र येते — जेव्हा झोप येत नाही, छताकडे बघत असतो, आणि मन विचारतं — हे असंच राहणार का?
+
+त्या रात्रीला घाबरू नका. ती रात्र तुम्हाला खोटं जगणं दाखवते. आणि जे खोटं आहे ते दिसलं की — खरं शोधता येतं.
+
+स्वप्न आणि पगार यांच्यात नेहमी अंतर नसतं. पण ते अंतर भरायला — आधी ते मान्य करावं लागतं.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="view-gd" class="inner-view">
+    <div class="g-wrapper">
+      
+      <h1 class="g-h1 reveal" style="color: var(--gd-accent);">Graphic Design & Video Editing</h1>
+      <h2 class="g-h1 reveal" style="margin-top: -10px;">Visuals that Speak.</h2>
+      <p class="g-p reveal">Merging creative vision with technical precision. From striking brand identities and marketing collateral to dynamic video edits that captivate audiences.</p>
+      
+      <div class="section-divider reveal"></div>
+      <h2 class="g-h2 reveal" style="margin-top: 0;">1. Graphic Design & Branding</h2>
+      <p class="g-p reveal">My complete collection of visual identity, product packaging, and branding design is securely hosted in a dedicated, high-resolution cloud archive.</p>
+
+      <a href="https://drive.google.com/drive/folders/1jyP5RojNHKeq_Gvt-P-oOApDIMT0gNdc?usp=sharing" target="_blank" class="drive-card reveal">
+        <div class="drive-glow"></div>
+        <div class="drive-card-content">
+          <svg class="drive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 11.5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7.5zM2 11.5V7a2 2 0 0 1 2-2h5.5l2 2H20a2 2 0 0 1 2 2v2.5"/>
+          </svg>
+          <div class="drive-text">
+            <h3>High-Resolution Cloud Archive</h3>
+            <p>Access Graphic Design Portfolio</p>
+          </div>
+        </div>
+        <div class="drive-arrow">→</div>
+      </a>
+
+      <div class="section-divider reveal"></div>
+      <h2 class="g-h2 reveal" style="margin-top: 0;">2. Video Post-Production</h2>
+      <p class="g-p reveal">Showcasing cinematic edits, color grading, and dynamic visual storytelling. Highlighting both short-form ambient cuts and atmospheric projects.</p>
+
+      <div class="video-grid reveal">
+        <div class="video-card">
+          <video autoplay loop muted playsinline preload="auto">
+            <source src="mixkit-bright-orange-sunset-on-beach-2168-full-hd.mp4" type="video/mp4">
+          </video>
+          <div class="video-info">
+            <h3>Ocean Sunset</h3>
+            <p>Cinematic Color Grade</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video autoplay loop muted playsinline preload="auto">
+            <source src="mixkit-raft-going-slowly-down-a-river-1218-full-hd.mp4" type="video/mp4">
+          </video>
+          <div class="video-info">
+            <h3>River Raft Journey</h3>
+            <p>Ambient Edit</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video autoplay loop muted playsinline preload="auto">
+            <source src="mixkit-the-camera-slowly-slides-into-the-tranquil-forest-on-a-50847-full-hd.mp4" type="video/mp4">
+          </video>
+          <div class="video-info">
+            <h3>Tranquil Forest</h3>
+            <p>Slow Motion Tracking</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video autoplay loop muted playsinline preload="auto">
+            <source src="100417-video-1080.mp4" type="video/mp4">
+          </video>
+          <div class="video-info">
+            <h3>Night Rain Lights</h3>
+            <p>Moody Atmospheric Cut</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <video autoplay loop muted playsinline preload="auto">
+            <source src="101516-video-1080.mp4" type="video/mp4">
+          </video>
+          <div class="video-info">
+            <h3>Serene Lakeside</h3>
+            <p>Nature B-Roll</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider reveal"></div>
+      <h2 class="g-h2 reveal">Contact</h2>
+      <p class="g-p reveal">Available for design projects, brand overhauls, and video edits.</p>
+      <p class="g-p reveal" style="font-weight: bold; color: var(--gd-text); font-family: 'Space Grotesk', sans-serif;">sampagare001@gmail.com</p>
+
+    </div>
+  </div>
+
+  <script>
+    const coverW = document.getElementById('cover-writer');
+    const coverG = document.getElementById('cover-gd');
+    const viewW = document.getElementById('view-writer');
+    const viewG = document.getElementById('view-gd');
+    const homeBtn = document.getElementById('home-btn');
+    const hub = document.getElementById('hub-container');
+    
+    // Cursors
+    const curWriter = document.getElementById('cur-writer');
+    const curGd = document.getElementById('cur-gd');
+    const cursorDot = document.getElementById('cursor-dot');
+    const cursor = document.getElementById('cursor');
+
+    let state = 'hub';
+
+    // Move dynamic cursors
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+      cursorDot.style.left = e.clientX + 'px';
+      cursorDot.style.top  = e.clientY + 'px';
+      
+      if(state === 'hub') {
+        cursorDot.style.background = e.clientX < window.innerWidth / 2 ? '#C9A84C' : '#00E5FF';
+      }
+    });
+
+    // Scroll Reveal Logic
+    const observerOptions = { threshold: 0.1, rootMargin: "0px" };
+    const scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    // Open Main Domains
+    function openPortfolio(side) {
+      if(state !== 'hub') return;
+      state = side;
+      hub.style.pointerEvents = 'none';
+
+      if(side === 'writer') {
+        coverG.style.width = '0';
+        coverW.style.width = '100vw';
+        
+        // Setup Writer Cursor
+        curWriter.style.opacity = '1';
+        cursorDot.style.opacity = '0';
+
+        setTimeout(() => {
+          coverW.style.opacity = '0';
+          viewW.classList.add('active');
+          document.querySelectorAll('#view-writer .reveal').forEach(el => scrollObserver.observe(el));
+        }, 800);
+
+      } else {
+        coverW.style.width = '0';
+        coverG.style.width = '100vw';
+        
+        // Setup GD Cursor
+        curGd.style.opacity = '1';
+        cursorDot.style.opacity = '0';
+
+        setTimeout(() => {
+          coverG.style.opacity = '0';
+          viewG.classList.add('active');
+          document.querySelectorAll('#view-gd .reveal').forEach(el => scrollObserver.observe(el));
+        }, 800);
+      }
+
+      setTimeout(() => { homeBtn.classList.add('visible'); }, 1200);
+    }
+
+    // Reset back to split-screen Hub
+    function resetToHub(e) {
+      e.preventDefault();
+      state = 'hub';
+      homeBtn.classList.remove('visible');
+      
+      // Ensure modals are closed
+      closeModal('poems-modal');
+      closeModal('articles-modal');
+      
+      viewW.classList.remove('active');
+      viewG.classList.remove('active');
+      
+      coverW.style.opacity = '1';
+      coverG.style.opacity = '1';
+      
+      setTimeout(() => {
+        coverW.style.width = '50vw';
+        coverG.style.width = '50vw';
+        hub.style.pointerEvents = 'auto';
+        
+        // Reset Cursors
+        curWriter.style.opacity = '0';
+        curGd.style.opacity = '0';
+        cursorDot.style.opacity = '1';
+        
+        document.querySelectorAll('.reveal').forEach(el => {
+            el.classList.remove('visible');
+            scrollObserver.unobserve(el);
+        });
+      }, 500);
+    }
+
+    // Dynamic Modal Logic (With Scroll Fix)
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      
+      // Fix: Instantly scroll the parent writer view to the absolute top 
+      // so the new overlay page begins perfectly at the top edge.
+      document.getElementById('view-writer').scrollTop = 0;
+      
+      modal.style.display = 'block';
+      setTimeout(() => {
+        modal.classList.add('open');
+        homeBtn.style.display = 'none';
+      }, 10);
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.remove('open');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        homeBtn.style.display = 'block';
+      }, 600);
+    }
+
+  </script>
+</body>
+</html>
