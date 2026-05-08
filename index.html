@@ -4,298 +4,813 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shamshon Pagare — Dual Portfolio</title>
-  
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Marck+Script&family=Baloo+2:wght@400;500;600&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  
   <style>
-    /* ── RESET & BASE ──────────────────────────────────────── */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      /* Writer Theme */
       --diary-blue: #080d1a;
       --gold:       #C9A84C;
       --gold-dim:   #7a5f28;
       --paper-bg:   #f4efd3;
       --ink-dark:   #1a1c23;
       --ink-light:  #3a3c4a;
-
-      /* Designer Theme */
       --gd-bg:      #fcfcfd;
       --gd-text:    #111116;
       --gd-muted:   #666677;
       --gd-accent:  #00E5FF;
       --gd-accent2: #FF007A;
-      
       --ease: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
+    html { scroll-behavior: smooth; }
     body {
-      background: #000;
-      color: #fff;
-      font-size: 18px;
-      line-height: 1.75;
-      overflow-x: hidden;
-      margin: 0;
-      text-align: left;
-      cursor: none; 
+      background: #000; color: #fff;
+      font-size: 18px; line-height: 1.75;
+      overflow-x: hidden; margin: 0; text-align: left; cursor: none;
     }
-
     a, button, .cover-half, iframe { cursor: none; }
 
-    /* ── CUSTOM CURSOR ──────────────────────────────────────── */
-    #cursor { 
-      position: fixed; pointer-events: none; z-index: 9999; top: 0; left: 0; 
-      transform: translate(-50%, -50%); transition: transform 0.08s ease; 
-      width: 32px; height: 32px; 
+    /* ── INTRO SPLASH ─────────────────────────────── */
+    #intro-splash {
+      position: fixed; inset: 0; z-index: 99999;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+      animation: splashExit 0.7s 2.2s var(--ease) forwards;
+      pointer-events: none;
     }
-    #cursor-dot { 
-      position: fixed; pointer-events: none; z-index: 9998; 
-      width: 6px; height: 6px; border-radius: 50%; top: 0; left: 0; 
-      transform: translate(-50%, -50%); transition: transform 0.04s ease, opacity 0.3s ease; 
+    @keyframes splashExit {
+      to { opacity: 0; visibility: hidden; }
+    }
+    .splash-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.4em; text-transform: uppercase;
+      background: linear-gradient(90deg, var(--gold), #fff, var(--gd-accent));
+      background-size: 200%;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: nameReveal 1.2s 0.3s var(--ease) forwards, gradientShift 3s 0.3s linear infinite;
+      opacity: 0;
+    }
+    @keyframes nameReveal {
+      from { opacity: 0; letter-spacing: 1em; filter: blur(8px); }
+      to   { opacity: 1; letter-spacing: 0.4em; filter: blur(0); }
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0%; }
+      100% { background-position: 200%; }
+    }
+    .splash-line {
+      width: 0; height: 1px;
+      background: linear-gradient(90deg, var(--gold), var(--gd-accent));
+      animation: lineExpand 0.8s 1s var(--ease) forwards;
+    }
+    @keyframes lineExpand { to { width: 220px; } }
+    .splash-sub {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+      opacity: 0;
+      animation: fadeUp 0.6s 1.4s var(--ease) forwards;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── READING PROGRESS ─────────────────────────── */
+    #reading-progress {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      height: 3px; width: 0%; pointer-events: none;
+      transition: width 0.05s linear;
+    }
+    .rp-writer { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+    .rp-gd { background: linear-gradient(90deg, var(--gd-accent2), var(--gd-accent)); }
+
+    /* ── CUSTOM CURSOR ─────────────────────────────── */
+    #cursor {
+      position: fixed; pointer-events: none; z-index: 9999;
+      top: 0; left: 0; transform: translate(-50%, -50%);
+      width: 32px; height: 32px;
+    }
+    #cursor-dot {
+      position: fixed; pointer-events: none; z-index: 9998;
+      width: 6px; height: 6px; border-radius: 50%; top: 0; left: 0;
+      transform: translate(-50%, -50%); transition: transform 0.04s ease;
       background: #fff;
     }
+    #cursor-ring {
+      position: fixed; pointer-events: none; z-index: 9996;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.3);
+      top: 0; left: 0; transform: translate(-50%, -50%);
+      transition: left 0.12s ease, top 0.12s ease, width 0.3s, height 0.3s, border-color 0.3s;
+    }
+    body.cursor-hover #cursor-ring {
+      width: 50px; height: 50px; border-color: rgba(255,255,255,0.6);
+    }
 
-    /* ── HUB (THE COVERS) ───────────────────────────────────── */
+    /* ── CURSOR TRAILS ────────────────────────────── */
+    .ink-drop {
+      position: fixed; pointer-events: none; z-index: 9990;
+      border-radius: 50%; transform: translate(-50%, -50%);
+      animation: inkDropFade 0.9s ease forwards;
+      background: radial-gradient(circle, rgba(201,168,76,0.9) 0%, rgba(201,168,76,0.2) 60%, transparent 100%);
+    }
+    @keyframes inkDropFade {
+      0%   { width: 10px; height: 10px; opacity: 0.8; }
+      50%  { width: 14px; height: 14px; opacity: 0.4; }
+      100% { width: 4px;  height: 4px;  opacity: 0; }
+    }
+    .neon-spark {
+      position: fixed; pointer-events: none; z-index: 9990;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--gd-accent);
+      box-shadow: 0 0 8px 2px var(--gd-accent);
+      transform: translate(-50%, -50%);
+      animation: sparkTrail 0.6s ease forwards;
+    }
+    @keyframes sparkTrail {
+      0%   { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0); }
+    }
+    .sparkle-star {
+      position: fixed; pointer-events: none; z-index: 9991;
+      color: var(--gold); font-size: 1rem; line-height: 1;
+      transform: translate(-50%, -50%);
+      animation: starPop 1.2s ease forwards;
+    }
+    @keyframes starPop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+      30%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(20deg); }
+      100% { opacity: 0; transform: translate(-50%, calc(-50% - 40px)) scale(0.6) rotate(40deg); }
+    }
+
+    /* ── HUB CONTAINER ────────────────────────────── */
     #hub-container {
       position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 100;
       display: flex; transition: opacity 0.5s;
     }
-
     .cover-half {
       position: absolute; top: 0; height: 100%;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: width 0.8s var(--ease), transform 0.8s var(--ease), opacity 0.5s;
+      transition: width 0.7s var(--ease), transform 0.7s var(--ease), opacity 0.5s;
       overflow: hidden;
     }
+    /* Expand hovered side with CSS :has() */
+    #hub-container:has(#cover-writer:hover) #cover-writer { width: 58vw; }
+    #hub-container:has(#cover-writer:hover) #cover-gd    { width: 42vw; }
+    #hub-container:has(#cover-gd:hover)    #cover-gd    { width: 58vw; }
+    #hub-container:has(#cover-gd:hover)    #cover-writer { width: 42vw; }
 
     #cover-writer {
       left: 0; width: 50vw;
       background-color: var(--diary-blue);
-      background-image: 
-        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%),
-        url("data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.2'/%3E%3C/svg%3E");
-      border-right: 2px solid rgba(201,168,76,0.3);
+      border-right: 1px solid rgba(201,168,76,0.15);
       z-index: 10;
     }
-    
     #cover-gd {
       right: 0; width: 50vw;
       background-color: var(--gd-bg);
-      background-image: radial-gradient(circle at top right, rgba(0, 229, 255, 0.1) 0%, transparent 60%);
       border-left: 1px solid rgba(0,0,0,0.05);
       z-index: 10;
     }
 
-    .cover-content { text-align: center; transition: transform 0.5s var(--ease); pointer-events: none; }
-    .cover-half:hover .cover-content { transform: scale(1.05); }
-    
-    .title-w { font-family: 'Cormorant Garamond', serif; font-size: 4rem; color: var(--gold); font-weight: 300; letter-spacing: 0.1em; }
-    .sub-w { font-family: 'Cormorant Garamond', serif; color: rgba(255,255,255,0.5); font-style: italic; margin-top: 10px; }
-    
-    .title-g { font-family: 'Space Grotesk', sans-serif; font-size: 4rem; font-weight: 700; color: var(--gd-text); letter-spacing: -0.05em; }
-    .sub-g { font-family: 'Space Grotesk', sans-serif; color: var(--gd-muted); margin-top: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem; }
+    /* Hub canvas overlay */
+    .hub-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
 
-    /* GD Stickers */
-    .sticker { position: absolute; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); pointer-events: none; opacity: 0.8;}
+    /* Cover content */
+    .cover-content {
+      text-align: center; z-index: 3; position: relative;
+      transition: transform 0.5s var(--ease);
+    }
+    .cover-half:hover .cover-content { transform: scale(1.06); }
+
+    .title-w {
+      font-family: 'Cormorant Garamond', serif; font-size: 4.5rem;
+      color: var(--gold); font-weight: 300; letter-spacing: 0.12em;
+      transition: letter-spacing 0.5s var(--ease), text-shadow 0.5s;
+    }
+    #cover-writer:hover .title-w {
+      letter-spacing: 0.22em;
+      text-shadow: 0 0 40px rgba(201,168,76,0.5), 0 0 80px rgba(201,168,76,0.2);
+    }
+    .sub-w {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      color: rgba(255,255,255,0.45); margin-top: 12px;
+      transition: color 0.4s;
+    }
+    #cover-writer:hover .sub-w { color: rgba(201,168,76,0.7); }
+
+    .title-g {
+      font-family: 'Space Grotesk', sans-serif; font-size: 4.5rem;
+      font-weight: 700; color: var(--gd-text); letter-spacing: -0.04em;
+      transition: letter-spacing 0.5s var(--ease), color 0.4s;
+    }
+    #cover-gd:hover .title-g { letter-spacing: -0.06em; color: #000; }
+    .sub-g {
+      font-family: 'Space Grotesk', sans-serif; color: var(--gd-muted);
+      margin-top: 12px; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; font-size: 0.8rem;
+      transition: color 0.4s, letter-spacing 0.4s;
+    }
+    #cover-gd:hover .sub-g { color: var(--gd-accent); letter-spacing: 0.2em; }
+
+    /* Enter label */
+    .enter-label {
+      position: absolute; bottom: 50px;
+      font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.5s, transform 0.5s;
+      z-index: 3;
+    }
+    #cover-writer .enter-label { font-family: 'Cormorant Garamond', serif; color: rgba(201,168,76,0.9); }
+    #cover-gd .enter-label { font-family: 'Space Grotesk', sans-serif; color: rgba(0,0,0,0.6); }
+    .cover-half:hover .enter-label { opacity: 1; transform: translateY(0); }
+
+    /* Stickers on GD side */
+    .sticker { position: absolute; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); pointer-events: none; opacity: 0.7; transition: opacity 0.4s, transform 0.4s; }
+    #cover-gd:hover .sticker { opacity: 1; }
     .s1 { top: 20%; left: 15%; width: 60px; transform: rotate(-15deg); }
     .s2 { bottom: 25%; right: 20%; width: 80px; transform: rotate(20deg); }
     .s3 { top: 30%; right: 25%; width: 40px; }
+    #cover-gd:hover .s1 { transform: rotate(-20deg) scale(1.1); }
+    #cover-gd:hover .s2 { transform: rotate(25deg) scale(1.1); }
+    #cover-gd:hover .s3 { transform: scale(1.2); }
 
-    /* ── INNER VIEWS (Under the Covers) ─────────────────────── */
-    .inner-view {
-      position: fixed; inset: 0; width: 100vw; height: 100vh; overflow-y: auto; overflow-x: hidden;
-      opacity: 0; pointer-events: none; transition: opacity 0.5s; z-index: 50;
-      text-align: left;
+    /* Hub centre divider */
+    #hub-divider {
+      position: absolute; left: 50%; top: 0; z-index: 20;
+      width: 0; height: 100%;
+      border-left: 1px solid;
+      border-image: linear-gradient(to bottom, transparent 0%, rgba(201,168,76,0.7) 30%, rgba(0,229,255,0.7) 70%, transparent 100%) 1;
+      transform: translateX(-50%);
+      pointer-events: none;
+      transition: border-image 0.6s;
     }
-    .inner-view.active { opacity: 1; pointer-events: auto; transition-delay: 0.4s; }
+    .divider-gem {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px; height: 14px;
+      background: linear-gradient(135deg, var(--gold), var(--gd-accent));
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      animation: gemSpin 6s linear infinite;
+      box-shadow: 0 0 20px rgba(201,168,76,0.6), 0 0 40px rgba(0,229,255,0.3);
+    }
+    @keyframes gemSpin {
+      0%   { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+      50%  { transform: translate(-50%, -50%) rotate(180deg) scale(1.4); }
+      100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+    }
 
-    /* --- WRITER CONTENT (Paper & Handwriting) --- */
+    /* Click ripple */
+    .click-ripple {
+      position: absolute; border-radius: 50%; pointer-events: none; z-index: 11;
+      transform: translate(-50%, -50%);
+      animation: rippleExpand 0.9s var(--ease) forwards;
+    }
+    .ripple-writer { background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.4); }
+    .ripple-gd { background: rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.3); }
+    @keyframes rippleExpand {
+      from { width: 0; height: 0; opacity: 1; }
+      to   { width: 600px; height: 600px; opacity: 0; }
+    }
+
+    /* ── INNER VIEWS ───────────────────────────────── */
+    .inner-view {
+      position: fixed; inset: 0; width: 100vw; height: 100vh;
+      overflow-y: auto; overflow-x: hidden;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s; z-index: 50; text-align: left;
+    }
+    .inner-view.active { opacity: 1; pointer-events: auto; transition-delay: 0.45s; }
+
+    /* ── WRITER VIEW ───────────────────────────────── */
     #view-writer {
       background-color: var(--paper-bg);
-      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      background-image:
+        /* Ruled lines */
+        repeating-linear-gradient(to bottom, transparent 0px, transparent 31px, rgba(100,120,180,0.07) 31px, rgba(100,120,180,0.07) 32px),
+        /* Noise texture */
+        url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
       color: var(--ink-dark);
-      font-family: 'Marck Script', cursive; 
+      font-family: 'Marck Script', cursive;
+      animation: none;
     }
+    /* Red margin line */
     #view-writer::before {
       content: ''; position: fixed; top: 0; left: 8vw; width: 2px; height: 100vh;
-      background: rgba(200, 50, 50, 0.2); pointer-events: none; z-index: 0;
+      background: rgba(200,50,50,0.18); pointer-events: none; z-index: 0;
+    }
+    /* Writer entry: ink bleed from corner */
+    #view-writer.entering {
+      animation: inkBleed 1s var(--ease) forwards;
+    }
+    @keyframes inkBleed {
+      from { clip-path: circle(0% at 0% 100%); }
+      to   { clip-path: circle(150% at 0% 100%); }
+    }
+
+    /* Quill background decoration */
+    .w-bg-quill {
+      position: fixed; right: 4vw; top: 8vh;
+      opacity: 0.04; pointer-events: none; z-index: 0;
+      width: 220px;
+      animation: quillSway 10s ease-in-out infinite;
+      transform-origin: 50% 90%;
+    }
+    @keyframes quillSway {
+      0%, 100% { transform: rotate(-6deg) translateY(0); }
+      50%       { transform: rotate(4deg) translateY(-10px); }
+    }
+
+    /* Ink splotch corner */
+    .w-ink-splotch {
+      position: fixed; pointer-events: none; z-index: 0; opacity: 0.04;
+    }
+
+    /* Writer header glow bar */
+    #view-writer.active::after {
+      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+      pointer-events: none; z-index: 10;
+      animation: headerPulse 5s ease-in-out infinite;
+    }
+    @keyframes headerPulse {
+      0%, 100% { opacity: 0.2; }
+      50%       { opacity: 0.7; }
     }
 
     .w-wrapper { max-width: 100%; margin: 0; padding: 100px 8vw 100px calc(8vw + 40px); position: relative; z-index: 2; }
-    
-    .w-h1 { font-size: 4.8rem; line-height: 1.1; margin-bottom: 20px; color: var(--ink-dark); font-weight: 400; transform: rotate(-2deg); transform-origin: left;}
-    .w-h2 { font-size: 3.2rem; margin: 60px 0 20px; color: var(--ink-dark); font-weight: 400; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 10px; }
+
+    .w-h1 { font-size: 4.8rem; line-height: 1.1; margin-bottom: 20px; color: var(--ink-dark); font-weight: 400; transform: rotate(-2deg); transform-origin: left; }
+    .w-h2 {
+      font-size: 3.2rem; margin: 60px 0 20px; color: var(--ink-dark); font-weight: 400;
+      padding-bottom: 12px; position: relative; display: inline-block;
+    }
+    .w-h2::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      height: 1px; width: 0%;
+      background: linear-gradient(90deg, var(--gold-dim), transparent);
+      transition: width 0.9s var(--ease);
+    }
+    .w-h2.visible::after { width: 100%; }
     .w-p { font-size: 2rem; line-height: 1.5; margin-bottom: 20px; color: var(--ink-light); }
-    
+
     .w-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 30px; }
-    .w-card { background: rgba(0,0,0,0.03); padding: 24px; border-radius: 8px; border: 1px dashed rgba(0,0,0,0.1); position: relative;}
+    .w-card {
+      background: rgba(0,0,0,0.03); padding: 24px; border-radius: 8px;
+      border: 1px dashed rgba(0,0,0,0.12); position: relative;
+      transition: transform 0.15s, box-shadow 0.3s, background 0.3s;
+      transform-style: preserve-3d; will-change: transform;
+    }
+    .w-card:hover {
+      background: rgba(201,168,76,0.04);
+      box-shadow: 0 20px 60px rgba(201,168,76,0.12);
+    }
     .w-card h3 { font-size: 2.2rem; margin-bottom: 5px; color: var(--ink-dark); }
-    
-    .btn-group { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;}
+
+    .btn-group { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
     .read-btn {
       display: inline-block; padding: 8px 20px;
-      font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
       color: var(--gold-dim); border: 1px solid var(--gold-dim); border-radius: 4px;
-      background: transparent; transition: all 0.3s; text-decoration: none;
+      background: transparent; transition: all 0.3s var(--ease), transform 0.3s var(--ease-back);
+      text-decoration: none; position: relative; overflow: hidden;
     }
-    .read-btn:hover { background: var(--gold-dim); color: var(--paper-bg); }
+    .read-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--gold-dim); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s var(--ease); z-index: -1;
+    }
+    .read-btn:hover { color: var(--paper-bg); border-color: var(--gold-dim); }
+    .read-btn:hover::before { transform: scaleX(1); }
 
-    /* ── EMBEDDED MODALS ─────────────────── */
+    /* ── EMBEDDED MODALS ───────────────────────────── */
     .embedded-modal {
       position: absolute; top: 0; left: 0; width: 100%; min-height: 100%;
       background-color: var(--paper-bg);
-      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
-      z-index: 100; transform: translateY(100%); transition: transform 0.6s var(--ease);
+      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      z-index: 100; transform: translateY(100%);
+      transition: transform 0.65s var(--ease);
       padding-bottom: 100px; display: none;
     }
     .embedded-modal.open { transform: translateY(0); display: block; }
 
     .modal-close-btn {
-      position: sticky; top: 30px; left: calc(100% - 150px); z-index: 101;
+      position: sticky; top: 30px; left: calc(100% - 180px); z-index: 101;
       font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 0.9rem;
-      color: var(--ink-dark); text-decoration: none; padding: 10px 20px; border: 1px solid rgba(0,0,0,0.2);
-      border-radius: 30px; background: rgba(244, 239, 211, 0.9); transition: all 0.3s;
+      color: var(--ink-dark); text-decoration: none; padding: 10px 22px;
+      border: 1px solid rgba(0,0,0,0.2); border-radius: 30px;
+      background: rgba(244,239,211,0.92); backdrop-filter: blur(8px);
+      transition: all 0.3s var(--ease-back), transform 0.3s var(--ease-back);
       display: inline-block; margin-bottom: -50px; float: right;
     }
-    .modal-close-btn:hover { background: var(--ink-dark); color: #fff; }
+    .modal-close-btn:hover { background: var(--ink-dark); color: #fff; transform: scale(1.05); }
 
     .section-divider {
-      width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(122, 95, 40, 0.4), transparent);
+      width: 100%; height: 1px; position: relative; overflow: hidden;
+      background: linear-gradient(to right, transparent, rgba(122,95,40,0.3), transparent);
       margin: 60px 0 50px 0;
     }
+    .section-divider::after {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+      animation: shimmerSlide 4s 1s ease-in-out infinite;
+    }
+    @keyframes shimmerSlide {
+      0%   { left: -50%; }
+      100% { left: 150%; }
+    }
 
-    .modal-intro { font-family: 'Marck Script', cursive; font-size: 2.2rem; color: var(--ink-light); margin-bottom: 25px; text-align: left; line-height: 1.5; max-width: 100%;}
-    
-    .poem-block { padding-left: 20px; border-left: 2px solid var(--gold-dim); max-width: 800px; margin-bottom: 60px;}
+    .modal-intro { font-family: 'Marck Script', cursive; font-size: 2.2rem; color: var(--ink-light); margin-bottom: 25px; text-align: left; line-height: 1.5; max-width: 100%; }
+
+    .poem-block {
+      padding: 20px 20px 20px 22px; border-left: 3px solid var(--gold-dim);
+      max-width: 800px; margin-bottom: 60px;
+      transition: transform 0.4s var(--ease), border-left-color 0.3s,
+                  border-left-width 0.3s, background 0.4s, box-shadow 0.4s;
+      border-radius: 0 8px 8px 0;
+    }
+    .poem-block:hover {
+      transform: translateX(14px);
+      background: rgba(201,168,76,0.05);
+      border-left-color: var(--gold);
+      border-left-width: 5px;
+      box-shadow: 0 10px 40px rgba(201,168,76,0.1);
+    }
     .poem-title-modal { font-family: 'Baloo 2', sans-serif; font-size: 1.8rem; font-weight: 600; color: var(--gold-dim); margin-bottom: 15px; }
     .poem-body { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; font-weight: 500; color: var(--ink-dark); white-space: pre-wrap; line-height: 1.8; }
 
-    .article-block { max-width: 900px; margin-bottom: 80px; }
+    .article-block {
+      max-width: 900px; margin-bottom: 80px; padding-left: 22px;
+      border-left: 3px solid transparent;
+      transition: transform 0.4s var(--ease), border-color 0.4s, background 0.4s;
+      border-radius: 0 8px 8px 0;
+    }
+    .article-block:hover {
+      transform: translateX(10px);
+      border-left-color: var(--ink-light);
+      background: rgba(0,0,0,0.02);
+    }
     .article-title-en { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 600; color: var(--ink-dark); margin-bottom: 15px; line-height: 1.2; }
     .article-body-en { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; color: var(--ink-dark); line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap; }
-    
     .article-title-mr { font-family: 'Baloo 2', sans-serif; font-size: 2rem; font-weight: 600; color: var(--ink-dark); margin-bottom: 15px; line-height: 1.2; }
     .article-body-mr { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; font-weight: 400; color: var(--ink-dark); line-height: 1.8; margin-bottom: 20px; text-align: justify; white-space: pre-wrap; }
 
-    /* --- DESIGNER CONTENT (Canvas) --- */
+    /* ── DESIGNER VIEW ─────────────────────────────── */
     #view-gd {
       background-color: var(--gd-bg);
-      background-image: 
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px),
-        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px);
       color: var(--gd-text);
       font-family: 'Space Grotesk', sans-serif;
+      position: relative;
+    }
+    /* Interactive dot canvas */
+    #gd-dot-canvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      opacity: 0; transition: opacity 1s;
+    }
+    #view-gd.active #gd-dot-canvas { opacity: 1; }
+
+    #view-gd.entering { animation: gridReveal 0.9s var(--ease) forwards; }
+    @keyframes gridReveal {
+      from { clip-path: inset(0 100% 0 0); }
+      to   { clip-path: inset(0 0% 0 0); }
     }
 
-    .g-wrapper { max-width: 100%; margin: 0; padding: 100px 8vw 100px 8vw; }
+    /* Floating shapes */
+    .g-floater { position: fixed; pointer-events: none; z-index: 1; }
+    .g-floater-1 {
+      top: 12%; right: 6%; width: 100px; height: 100px;
+      border: 1.5px solid rgba(0,229,255,0.18);
+      border-radius: 50%;
+      animation: floatA 7s ease-in-out infinite alternate;
+    }
+    .g-floater-2 {
+      bottom: 18%; left: 4%; width: 70px; height: 70px;
+      border: 1.5px solid rgba(255,0,122,0.15);
+      transform: rotate(45deg);
+      animation: floatB 9s ease-in-out infinite alternate;
+    }
+    .g-floater-3 {
+      top: 55%; right: 3%; width: 45px; height: 45px;
+      background: rgba(0,229,255,0.06);
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      animation: floatC 5s ease-in-out infinite alternate;
+    }
+    .g-floater-4 {
+      top: 30%; left: 3%; width: 30px; height: 30px;
+      border-radius: 50%;
+      background: rgba(255,0,122,0.08);
+      animation: floatD 6s ease-in-out infinite alternate;
+    }
+    @keyframes floatA { from { transform: translateY(0) rotate(0); }  to { transform: translateY(-25px) rotate(90deg); } }
+    @keyframes floatB { from { transform: rotate(45deg) translateY(0); }  to { transform: rotate(45deg) translateY(-18px); } }
+    @keyframes floatC { from { transform: translateY(0) scale(1); }  to { transform: translateY(-20px) scale(1.15); } }
+    @keyframes floatD { from { transform: translateY(0) scale(1); }  to { transform: translateY(-15px) scale(0.8); } }
+
+    .g-wrapper { max-width: 100%; margin: 0; padding: 100px 8vw 100px 8vw; position: relative; z-index: 2; }
+
     .g-h1 { font-size: clamp(3rem, 5vw, 5rem); font-weight: 700; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.04em; }
-    .g-h2 { font-size: 2.5rem; font-weight: 700; margin: 80px 0 30px; letter-spacing: -0.02em; }
-    .g-h3 { font-size: 1.5rem; font-weight: 600; margin: 50px 0 20px; color: var(--gd-accent); letter-spacing: 0.05em; text-transform: uppercase;}
+    .g-h2 {
+      font-size: 2.5rem; font-weight: 700; margin: 80px 0 30px; letter-spacing: -0.02em;
+      position: relative; display: inline-block;
+    }
+    .g-h2::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--gd-accent), var(--gd-accent2));
+      transition: width 0.8s var(--ease);
+    }
+    .g-h2.visible::after { width: 100%; }
+
+    .g-h3 { font-size: 1.5rem; font-weight: 600; margin: 50px 0 20px; color: var(--gd-accent); letter-spacing: 0.05em; text-transform: uppercase; }
     .g-p { font-size: 1.2rem; color: var(--gd-muted); line-height: 1.6; margin-bottom: 20px; max-width: 800px; }
-    
+
+    /* Glitch heading */
+    .g-glitch { position: relative; display: inline-block; }
+    .g-glitch::before, .g-glitch::after {
+      content: attr(data-text); position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--gd-bg);
+    }
+    .g-glitch::before {
+      color: var(--gd-accent2);
+      animation: glitchClip1 8s infinite;
+    }
+    .g-glitch::after {
+      color: var(--gd-accent);
+      animation: glitchClip2 8s 0.06s infinite;
+    }
+    @keyframes glitchClip1 {
+      0%,88%,100% { clip-path: inset(100% 0 0 0); transform: translate(0); }
+      89% { clip-path: inset(25% 0 55% 0); transform: translate(-5px, 2px); }
+      90% { clip-path: inset(60% 0 15% 0); transform: translate(5px,-2px); }
+      91% { clip-path: inset(8% 0 75% 0); transform: translate(-3px, 1px); }
+      92% { clip-path: inset(75% 0 8% 0); transform: translate(3px,-1px); }
+      93% { clip-path: inset(42% 0 42% 0); transform: translate(-4px, 0); }
+    }
+    @keyframes glitchClip2 {
+      0%,88%,100% { clip-path: inset(100% 0 0 0); transform: translate(0); }
+      89% { clip-path: inset(55% 0 25% 0); transform: translate(5px,-2px); }
+      90% { clip-path: inset(15% 0 65% 0); transform: translate(-5px, 2px); }
+      91% { clip-path: inset(75% 0 8% 0); transform: translate(3px,-1px); }
+      92% { clip-path: inset(5% 0 78% 0); transform: translate(-3px, 1px); }
+      93% { clip-path: inset(38% 0 48% 0); transform: translate(4px, 0); }
+    }
+
     .g-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 20px; }
-    .g-card { background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);}
-    .g-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,229,255,0.1); }
+    .g-card {
+      background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 30px;
+      border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      transition: box-shadow 0.4s, border-color 0.4s;
+      transform-style: preserve-3d; will-change: transform;
+    }
+    .g-card:hover {
+      box-shadow: 0 25px 50px rgba(0,229,255,0.12);
+      border-color: rgba(0,229,255,0.2);
+    }
     .g-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
     .g-card p { font-size: 1rem; color: var(--gd-muted); }
 
-    /* Premium Drive Folder Link Card */
+    /* Drive card */
     .drive-card {
       display: flex; align-items: center; justify-content: space-between;
-      background: rgba(17, 17, 22, 0.95);
-      border: 1px solid rgba(0, 229, 255, 0.2);
+      background: rgba(17,17,22,0.95);
+      border: 1px solid rgba(0,229,255,0.2);
       border-radius: 16px; padding: 40px; margin-top: 30px;
       text-decoration: none; position: relative; overflow: hidden;
-      transition: all 0.4s var(--ease);
+      transition: transform 0.4s var(--ease), border-color 0.4s, box-shadow 0.4s;
       box-shadow: 0 10px 30px rgba(0,0,0,0.05);
       max-width: 900px;
     }
-    .drive-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(0, 229, 255, 0.6);
-      box-shadow: 0 20px 40px rgba(0, 229, 255, 0.15);
+    .drive-card::before {
+      content: ''; position: absolute; inset: -2px; border-radius: 18px;
+      background: linear-gradient(90deg, var(--gd-accent), var(--gd-accent2), var(--gd-accent));
+      background-size: 300%; z-index: -1; opacity: 0;
+      transition: opacity 0.4s;
+      animation: borderGlow 4s linear infinite;
     }
+    .drive-card:hover::before { opacity: 1; }
+    @keyframes borderGlow {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+    .drive-card:hover { transform: translateY(-6px); border-color: rgba(0,229,255,0.6); box-shadow: 0 25px 50px rgba(0,229,255,0.18); }
     .drive-card-content { display: flex; align-items: center; gap: 20px; z-index: 2; }
     .drive-icon { width: 45px; height: 45px; color: var(--gd-accent); }
-    .drive-text h3 { color: #fff; font-size: 1.6rem; margin: 0 0 5px 0; font-weight: 700; font-family: 'Space Grotesk', sans-serif;}
+    .drive-text h3 { color: #fff; font-size: 1.6rem; margin: 0 0 5px 0; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
     .drive-text p { color: var(--gd-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin: 0; }
     .drive-arrow { color: var(--gd-accent); font-size: 2rem; transition: transform 0.4s; z-index: 2; }
-    .drive-card:hover .drive-arrow { transform: translateX(10px); }
-    .drive-glow {
-      position: absolute; top: 0; right: 0; width: 300px; height: 100%;
-      background: radial-gradient(circle at right, rgba(0,229,255,0.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
+    .drive-card:hover .drive-arrow { transform: translateX(12px); }
+    .drive-glow { position: absolute; top: 0; right: 0; width: 300px; height: 100%; background: radial-gradient(circle at right, rgba(0,229,255,0.12) 0%, transparent 70%); pointer-events: none; }
 
-    /* Video Embeds */
+    /* Video grid */
     .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px; }
-    .video-card { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.08); background: #000; transition: transform 0.4s var(--ease); }
-    .video-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,229,255,0.2); }
-    .video-card video { width: 100%; height: 280px; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.4s; }
-    .video-card:hover video { opacity: 1; }
-    .video-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 30px 25px; background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4), transparent); color: #fff; pointer-events: none;}
+    .video-card {
+      position: relative; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.08); background: #000;
+      transform-style: preserve-3d; will-change: transform;
+      transition: box-shadow 0.4s;
+    }
+    .video-card:hover { box-shadow: 0 30px 60px rgba(0,229,255,0.2); }
+    .video-card video { width: 100%; height: 280px; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.4s, transform 0.6s var(--ease); }
+    .video-card:hover video { opacity: 1; transform: scale(1.06); }
+    .video-info {
+      position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 30px 25px;
+      background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4), transparent);
+      color: #fff; pointer-events: none;
+      transform: translateY(8px); transition: transform 0.4s;
+    }
+    .video-card:hover .video-info { transform: translateY(0); }
     .video-info h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; color: #fff; }
 
-    /* Clean Scroll Reveal Animations */
-    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* Home Button */
-    .home-btn {
-      position: fixed; top: 30px; right: 40px; z-index: 600;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.9rem;
-      color: #000; text-decoration: none; padding: 10px 20px; border: 2px solid rgba(0,0,0,0.2);
-      border-radius: 30px; opacity: 0; pointer-events: none; transition: all 0.3s;
-      background: rgba(255,255,255,0.8);
+    /* Scan line on video card hover */
+    .video-card::after {
+      content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,229,255,0.08) 50%, transparent 60%);
+      pointer-events: none;
+      transition: top 0.6s;
     }
-    .home-btn:hover { background: #000; color: #fff; border-color: #000; }
+    .video-card:hover::after { top: 100%; }
+
+    /* ── SCROLL REVEAL ─────────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(35px);
+      transition: opacity 0.85s var(--ease), transform 0.85s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal:nth-child(1) { transition-delay: 0s; }
+    .reveal:nth-child(2) { transition-delay: 0.08s; }
+    .reveal:nth-child(3) { transition-delay: 0.16s; }
+    .reveal:nth-child(4) { transition-delay: 0.24s; }
+
+    /* ── HOME BUTTON ──────────────────────────────── */
+    .home-btn {
+      position: fixed; top: 28px; right: 36px; z-index: 600;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem;
+      color: #000; text-decoration: none; padding: 10px 22px;
+      border: 2px solid rgba(0,0,0,0.18); border-radius: 30px;
+      opacity: 0; pointer-events: none; transition: all 0.3s var(--ease-back);
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+    }
+    .home-btn:hover { background: #000; color: #fff; border-color: #000; transform: scale(1.05); }
     .home-btn.visible { opacity: 1; pointer-events: auto; }
 
+    /* Writer mode home btn */
+    .home-btn.writer-mode {
+      background: rgba(244,239,211,0.9); color: var(--ink-dark);
+      border-color: rgba(0,0,0,0.15);
+      font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 0.95rem;
+    }
+    .home-btn.writer-mode:hover { background: var(--ink-dark); color: var(--paper-bg); }
+
+    /* ── SCROLL HINT ──────────────────────────────── */
+    .scroll-hint {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      opacity: 0; pointer-events: none; z-index: 500;
+      transition: opacity 0.5s;
+    }
+    .scroll-hint.show { opacity: 0.5; }
+    .scroll-hint.hide { opacity: 0; }
+    .scroll-hint span { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; }
+    .scroll-hint-arrow {
+      width: 18px; height: 18px;
+      border-right: 2px solid; border-bottom: 2px solid;
+      transform: rotate(45deg);
+      animation: arrowBob 1.2s ease-in-out infinite;
+    }
+    @keyframes arrowBob {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50%       { transform: rotate(45deg) translateY(6px); }
+    }
+    #writer-scroll-hint span { color: var(--ink-dark); }
+    #writer-scroll-hint .scroll-hint-arrow { border-color: var(--ink-dark); }
+    #gd-scroll-hint span { color: var(--gd-text); }
+    #gd-scroll-hint .scroll-hint-arrow { border-color: var(--gd-text); }
+
+    /* ── TYPEWRITER ────────────────────────────────── */
+    .tw-cursor {
+      display: inline-block; width: 2px; height: 1.1em;
+      background: var(--gold); margin-left: 3px; vertical-align: text-bottom;
+      animation: twBlink 0.7s infinite;
+    }
+    @keyframes twBlink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+    /* ── POEM STAGGER REVEAL ───────────────────────── */
+    .poem-block.poem-reveal {
+      opacity: 0; transform: translateX(-20px);
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    }
+    .poem-block.poem-reveal.visible { opacity: 1; transform: translateX(0); }
   </style>
 </head>
 <body>
 
+  <!-- ── INTRO SPLASH ── -->
+  <div id="intro-splash">
+    <p class="splash-name">Shamshon Pagare</p>
+    <div class="splash-line"></div>
+    <p class="splash-sub">Writer · Designer · Mumbai</p>
+  </div>
+
+  <!-- ── READING PROGRESS ── -->
+  <div id="reading-progress" class="rp-writer"></div>
+
+  <!-- ── CURSORS ── -->
   <div id="cursor">
-    <svg id="cur-writer" viewBox="0 0 32 32" fill="none" style="position: absolute; opacity: 0; transition: opacity 0.3s ease;">
+    <svg id="cur-writer" viewBox="0 0 32 32" fill="none" style="position:absolute;opacity:0;transition:opacity 0.3s;">
       <path d="M8 26L6 30L10 28L26 8L22 4L8 26Z" fill="#C9A84C" stroke="#E2C97E" stroke-width="0.6"/>
       <path d="M6 30L7.5 27L9 28.5L6 30Z" fill="#7a5f28"/>
       <rect x="22.5" y="1.5" width="4" height="4" transform="rotate(45 22.5 1.5)" fill="#E2C97E" stroke="#C9A84C" stroke-width="0.5"/>
     </svg>
-    <svg id="cur-gd" viewBox="0 0 32 32" fill="none" style="position: absolute; opacity: 0; transition: opacity 0.3s ease;">
+    <svg id="cur-gd" viewBox="0 0 32 32" fill="none" style="position:absolute;opacity:0;transition:opacity 0.3s;">
       <path d="M12 20 L4 28 L10 28 L28 10 L22 4 Z" fill="#00E5FF" stroke="#000" stroke-width="0.5"/>
+      <circle cx="28" cy="4" r="3" fill="#FF007A"/>
     </svg>
   </div>
   <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
 
-  <a href="#" class="home-btn" id="home-btn" onclick="resetToHub(event)">⌂ CLOSE PORTFOLIO</a>
+  <!-- ── HOME BUTTON ── -->
+  <a href="#" class="home-btn" id="home-btn" onclick="resetToHub(event)">⌂ Close</a>
 
+  <!-- ── HUB ── -->
   <div id="hub-container">
-    <div id="cover-writer" class="cover-half" onclick="openPortfolio('writer')">
+    <div id="cover-writer" class="cover-half" onclick="openPortfolio('writer', event)">
+      <canvas class="hub-canvas" id="writer-canvas"></canvas>
+
+      <!-- Decorative feather on writer cover -->
+      <svg style="position:absolute;right:8%;top:10%;opacity:0.07;width:160px;pointer-events:none;z-index:2;animation:quillSway 10s ease-in-out infinite;transform-origin:50% 90%;" viewBox="0 0 80 200" fill="none">
+        <path d="M40 200 C40 200 5 150 8 100 C11 50 30 30 40 0 C50 30 69 50 72 100 C75 150 40 200 40 200Z" fill="rgba(201,168,76,0.9)"/>
+        <line x1="40" y1="200" x2="40" y2="10" stroke="rgba(201,168,76,0.5)" stroke-width="1"/>
+        <path d="M40 60 C25 55 15 65 10 80" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 80 C25 75 12 85 8 100" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 100 C26 95 14 105 9 118" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 120 C27 116 16 126 12 138" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 60 C55 55 65 65 70 80" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 80 C55 75 68 85 72 100" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 100 C54 95 66 105 71 118" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+        <path d="M40 120 C53 116 64 126 68 138" stroke="rgba(201,168,76,0.4)" stroke-width="0.8" fill="none"/>
+      </svg>
+
       <div class="cover-content">
         <h2 class="title-w">Writer</h2>
         <p class="sub-w">The Diary</p>
       </div>
+      <p class="enter-label">Enter The Diary →</p>
     </div>
 
-    <div id="cover-gd" class="cover-half" onclick="openPortfolio('gd')">
+    <!-- Centre divider -->
+    <div id="hub-divider"><div class="divider-gem"></div></div>
+
+    <div id="cover-gd" class="cover-half" onclick="openPortfolio('gd', event)">
+      <canvas class="hub-canvas" id="gd-canvas"></canvas>
+
       <svg class="sticker s1" viewBox="0 0 100 100" fill="#FF007A"><path d="M50 0 L60 35 L95 35 L65 55 L75 90 L50 70 L25 90 L35 55 L5 35 L40 35 Z"/></svg>
       <svg class="sticker s2" viewBox="0 0 100 100" fill="none" stroke="#00E5FF" stroke-width="8"><circle cx="50" cy="50" r="40"/></svg>
       <svg class="sticker s3" viewBox="0 0 100 100" fill="#111116"><circle cx="20" cy="20" r="10"/><circle cx="80" cy="20" r="10"/><circle cx="20" cy="80" r="10"/><circle cx="80" cy="80" r="10"/></svg>
-      
+
       <div class="cover-content">
         <h2 class="title-g">Designer</h2>
         <p class="sub-g">The Sketchbook</p>
       </div>
+      <p class="enter-label">← Enter The Sketchbook</p>
     </div>
   </div>
 
+  <!-- ── WRITER VIEW ── -->
   <div id="view-writer" class="inner-view">
-    
+    <!-- Decorative quill watermark -->
+    <svg class="w-bg-quill" viewBox="0 0 80 200" fill="none">
+      <path d="M40 200 C40 200 5 150 8 100 C11 50 30 30 40 0 C50 30 69 50 72 100 C75 150 40 200 40 200Z" fill="rgba(122,95,40,1)"/>
+      <line x1="40" y1="200" x2="40" y2="10" stroke="rgba(122,95,40,0.5)" stroke-width="1"/>
+      <path d="M40 60 C25 55 15 65 10 80" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 80 C25 75 12 85 8 100" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 100 C26 95 14 105 9 118" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 120 C27 116 16 126 12 138" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 60 C55 55 65 65 70 80" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 80 C55 75 68 85 72 100" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 100 C54 95 66 105 71 118" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+      <path d="M40 120 C53 116 64 126 68 138" stroke="rgba(122,95,40,0.6)" stroke-width="0.8" fill="none"/>
+    </svg>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint" id="writer-scroll-hint">
+      <span>Scroll to explore</span>
+      <div class="scroll-hint-arrow"></div>
+    </div>
+
     <div class="w-wrapper" id="main-writer-content">
-      <h1 class="w-h1 reveal">Shamshon Pagare</h1>
-      <p class="w-p reveal">Words crafted across languages — English, Marathi, Urdu, Hindi — each one a thread in the fabric of story.</p>
-      
+      <h1 class="w-h1 reveal">Shamshon Pagare<span class="tw-cursor" id="tw-cursor" style="display:none;"></span></h1>
+      <p class="w-p reveal" id="writer-subtitle">Words crafted across languages — English, Marathi, Urdu, Hindi — each one a thread in the fabric of story.</p>
+
       <h2 class="w-h2 reveal">About Me</h2>
       <p class="w-p reveal">I am a Mumbai-based writer with over six years of professional experience spanning creative essays, poetry, shayari, and scripts. My work moves fluidly between languages — finding lyrical precision in Urdu, narrative depth in Marathi, and editorial clarity in English.</p>
 
@@ -303,15 +818,14 @@
       <div class="w-grid reveal">
         <div class="w-card">
           <h3>Poetry & Shayari</h3>
-          <p class="w-p" style="font-size:1.6rem; margin-bottom: 0;">Original verse in Urdu and Hindi — romantic, lyrical, rooted in classical tradition.</p>
+          <p class="w-p" style="font-size:1.6rem;margin-bottom:0;">Original verse in Urdu and Hindi — romantic, lyrical, rooted in classical tradition.</p>
           <div class="btn-group">
             <button class="read-btn" onclick="openModal('poems-modal')">Read Poems</button>
           </div>
         </div>
-        
         <div class="w-card">
           <h3>Essays & Articles</h3>
-          <p class="w-p" style="font-size:1.6rem; margin-bottom: 0;">Long-form writing on culture, identity, art, and the textures of everyday life.</p>
+          <p class="w-p" style="font-size:1.6rem;margin-bottom:0;">Long-form writing on culture, identity, art, and the textures of everyday life.</p>
           <div class="btn-group">
             <button class="read-btn" onclick="openModal('articles-modal')">Read Articles</button>
           </div>
@@ -320,14 +834,15 @@
 
       <h2 class="w-h2 reveal">Let's Collaborate</h2>
       <p class="w-p reveal">Available for essays, brand copy, lyrics, scripts, and editorial assignments. I write with care — and I always meet a deadline.</p>
-      <p class="w-p reveal" style="font-weight: bold; font-family: 'Cormorant Garamond', serif;">sampagare001@gmail.com</p>
+      <p class="w-p reveal" style="font-weight:bold;font-family:'Cormorant Garamond',serif;">sampagare001@gmail.com</p>
     </div>
 
+    <!-- ── POEMS MODAL ── -->
     <div id="poems-modal" class="embedded-modal">
-      <div class="w-wrapper" style="padding-top: 60px;">
+      <div class="w-wrapper" style="padding-top:60px;">
         <button class="modal-close-btn" onclick="closeModal('poems-modal')">↓ Back to Profile</button>
-        <h1 class="w-h1" style="font-size: 4rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; margin-bottom: 40px; transform: none;">The Poetry Collection</h1>
-        
+        <h1 class="w-h1" style="font-size:4rem;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:20px;margin-bottom:40px;transform:none;">The Poetry Collection</h1>
+
         <p class="modal-intro">These poems did not begin as poems.</p>
         <p class="modal-intro">They began as feelings I could not explain at dinner tables. As thoughts that arrived at 2am uninvited, settled into the mattress beside me, and refused to leave by morning. As the strange, stubborn weight of ordinary moments that somehow refused to stay ordinary — a cup of tea going cold, a name I almost said out loud, a window I stood at for too long without knowing why.</p>
         <p class="modal-intro">I am not the kind of writer who sits down and decides to write a poem. I am the kind who carries something wordless around for days, sometimes weeks, until it becomes too heavy to carry silently. Until the only way to set it down is to find the exact right words for it — and then break those words into lines, because somehow a line break says what a comma cannot.</p>
@@ -339,7 +854,7 @@
 
         <div class="section-divider"></div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">1. आसमान की बंदीशें</div>
           <div class="poem-body">वो आँखें गड़ाये बैठी है उन तारों की ओर,
 उम्मीद थी के कोई तारा टूट कर झोली में गिरे तो छुपा के रख लूँगी।
@@ -364,7 +879,7 @@
 उस रात आसमान ने अपनी बंदिशें तोड़ दी!</div>
         </div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">2. पिया मोहे काहे सताये</div>
           <div class="poem-body">एक तरफ सूरज ढल ही रहा है,
 एक तरफ वो अपने आँगन में बैठे इंतज़ार करती रही।
@@ -386,7 +901,7 @@
 पिया बिन कभी कटता भी नहीं!</div>
         </div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">3. कल की रात तेरे बिन कटी!</div>
           <div class="poem-body">रुक तो गई थी साँसें कुछ पल के लिए,
 बेबसी के अरमान भी कुछ धुल से गए थे।
@@ -421,7 +936,7 @@
 कल की रात तेरे बिन कटी!</div>
         </div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">4. फ़ुर्सत थी! रात थी! तन्हाई थी! और दर्द भी!</div>
           <div class="poem-body">फ़ुर्सत थी! रात थी! तन्हाई थी! और दर्द भी!
 एक दर्द को उतारा सोच से और बिठा दिया पास में।
@@ -469,7 +984,7 @@
 कश्ती अगर डगमगाने लगे तो हमारी तरफ़ उसे मोड़ लेना।</div>
         </div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">5. एक याद ख़ामोश सी...</div>
           <div class="poem-body">भर सुनता रहा जो बूँद बूँद बरस रही थी चाँदनी,
 तुम्हारी साँसों की आहट ख़ामोश झील सी महसूस हुई।
@@ -497,7 +1012,7 @@
 वो रात मुझे लौटा दो!</div>
         </div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">6. मेरे चेहरे पे तेरी हथेली का लम्स कुछ ऐसे छलक रहा है</div>
           <div class="poem-body">मेरे चेहरे पे तेरी हथेली का लम्स कुछ ऐसे छलक रहा है,
 जैसे गहरी रात में एक झील पे सफ़ेद चाँद बरस रहा हो।
@@ -560,7 +1075,7 @@
 भीगे जज़्बात अब किसकी आग में जलें!</div>
         </div>
 
-        <div class="poem-block">
+        <div class="poem-block poem-reveal">
           <div class="poem-title-modal">8. प्रिय फूल</div>
           <div class="poem-body">रे माझ्या फुला तू
 येऊन भेट मला तू
@@ -606,16 +1121,16 @@
 जुन्या धाग्यात गुंतलेले ते हात
 तू आलीस, पण मला मात्र सापडली नाही!</div>
         </div>
-
       </div>
     </div>
 
+    <!-- ── ARTICLES MODAL ── -->
     <div id="articles-modal" class="embedded-modal">
-      <div class="w-wrapper" style="padding-top: 60px;">
+      <div class="w-wrapper" style="padding-top:60px;">
         <button class="modal-close-btn" onclick="closeModal('articles-modal')">↓ Back to Profile</button>
-        
-        <h1 class="w-h1" style="font-size: 4rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; margin-bottom: 40px; transform: none;">Articles & Essays</h1>
-        
+
+        <h1 class="w-h1" style="font-size:4rem;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:20px;margin-bottom:40px;transform:none;">Articles & Essays</h1>
+
         <p class="modal-intro">I write about the strange, tender, and often unspoken corners of human experience — for readers who think a little too much and feel a little too deeply. My work spans longform essays, cultural commentary, and copy that carries a soul.</p>
         <p class="modal-intro">I'm drawn to the questions nobody asks out loud. The ones that live in the pause between sentences, in the middle of ordinary Tuesdays, in the feeling you can't quite name but recognise the moment someone else names it first. That's where I write from. And if you've ever put down a piece of writing and felt, just briefly, less alone in the world — that's exactly what I'm reaching for.</p>
         <p class="modal-intro">Over six years, I've written across personal Poetry, Scripts, Short Stories, culture, and brand storytelling. The topics change. The intent doesn't: to make the reader feel that someone, somewhere, was paying close enough attention to put it into words.</p>
@@ -722,8 +1237,6 @@ To be known is also to be, in some small measure, fixed. Pinned. Real.
 And sometimes we were quite comfortable not being entirely real.</div>
         </div>
 
-        <div class="article-line-break"></div>
-
         <div class="article-block">
           <div class="article-title-mr">7. मुंबई मध्यरात्री — गोंधळाला एक प्रेमपत्र</div>
           <div class="article-body-mr">मुंबई तुम्हाला कधीच विचारत नाही — तू कोण आहेस? तू कुठून आलास? तुला काय हवंय?
@@ -789,20 +1302,34 @@ And sometimes we were quite comfortable not being entirely real.</div>
 
 स्वप्न आणि पगार यांच्यात नेहमी अंतर नसतं. पण ते अंतर भरायला — आधी ते मान्य करावं लागतं.</div>
         </div>
-
       </div>
     </div>
   </div>
 
+  <!-- ── DESIGNER VIEW ── -->
   <div id="view-gd" class="inner-view">
+    <canvas id="gd-dot-canvas"></canvas>
+
+    <!-- Floating geometric shapes -->
+    <div class="g-floater g-floater-1"></div>
+    <div class="g-floater g-floater-2"></div>
+    <div class="g-floater g-floater-3"></div>
+    <div class="g-floater g-floater-4"></div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint" id="gd-scroll-hint">
+      <span>Scroll to explore</span>
+      <div class="scroll-hint-arrow"></div>
+    </div>
+
     <div class="g-wrapper">
-      
-      <h1 class="g-h1 reveal" style="color: var(--gd-accent);">Graphic Design & Video Editing</h1>
-      <h2 class="g-h1 reveal" style="margin-top: -10px;">Visuals that Speak.</h2>
+      <h1 class="g-h1 g-glitch reveal" data-text="Graphic Design &amp; Video Editing" style="color:var(--gd-accent);">Graphic Design &amp; Video Editing</h1>
+      <h2 class="g-h1 reveal" style="margin-top:-10px;">Visuals that Speak.</h2>
       <p class="g-p reveal">Merging creative vision with technical precision. From striking brand identities and marketing collateral to dynamic video edits that captivate audiences.</p>
-      
+
       <div class="section-divider reveal"></div>
-      <h2 class="g-h2 reveal" style="margin-top: 0;">1. Graphic Design & Branding</h2>
+
+      <h2 class="g-h2 reveal" style="margin-top:0;">1. Graphic Design &amp; Branding</h2>
       <p class="g-p reveal">My complete collection of visual identity, product packaging, and branding design is securely hosted in a dedicated, high-resolution cloud archive.</p>
 
       <a href="https://drive.google.com/drive/folders/1jyP5RojNHKeq_Gvt-P-oOApDIMT0gNdc?usp=sharing" target="_blank" class="drive-card reveal">
@@ -820,7 +1347,7 @@ And sometimes we were quite comfortable not being entirely real.</div>
       </a>
 
       <div class="section-divider reveal"></div>
-      <h2 class="g-h2 reveal" style="margin-top: 0;">2. Video Post-Production</h2>
+      <h2 class="g-h2 reveal" style="margin-top:0;">2. Video Post-Production</h2>
       <p class="g-p reveal">Showcasing cinematic edits, color grading, and dynamic visual storytelling. Highlighting both short-form ambient cuts and atmospheric projects.</p>
 
       <div class="video-grid reveal">
@@ -828,189 +1355,560 @@ And sometimes we were quite comfortable not being entirely real.</div>
           <video autoplay loop muted playsinline preload="auto">
             <source src="mixkit-bright-orange-sunset-on-beach-2168-full-hd.mp4" type="video/mp4">
           </video>
-          <div class="video-info">
-            <h3>Ocean Sunset</h3>
-            <p>Cinematic Color Grade</p>
-          </div>
+          <div class="video-info"><h3>Ocean Sunset</h3><p>Cinematic Color Grade</p></div>
         </div>
         <div class="video-card">
           <video autoplay loop muted playsinline preload="auto">
             <source src="mixkit-raft-going-slowly-down-a-river-1218-full-hd.mp4" type="video/mp4">
           </video>
-          <div class="video-info">
-            <h3>River Raft Journey</h3>
-            <p>Ambient Edit</p>
-          </div>
+          <div class="video-info"><h3>River Raft Journey</h3><p>Ambient Edit</p></div>
         </div>
         <div class="video-card">
           <video autoplay loop muted playsinline preload="auto">
             <source src="mixkit-the-camera-slowly-slides-into-the-tranquil-forest-on-a-50847-full-hd.mp4" type="video/mp4">
           </video>
-          <div class="video-info">
-            <h3>Tranquil Forest</h3>
-            <p>Slow Motion Tracking</p>
-          </div>
+          <div class="video-info"><h3>Tranquil Forest</h3><p>Slow Motion Tracking</p></div>
         </div>
         <div class="video-card">
           <video autoplay loop muted playsinline preload="auto">
             <source src="100417-video-1080.mp4" type="video/mp4">
           </video>
-          <div class="video-info">
-            <h3>Night Rain Lights</h3>
-            <p>Moody Atmospheric Cut</p>
-          </div>
+          <div class="video-info"><h3>Night Rain Lights</h3><p>Moody Atmospheric Cut</p></div>
         </div>
         <div class="video-card">
           <video autoplay loop muted playsinline preload="auto">
             <source src="101516-video-1080.mp4" type="video/mp4">
           </video>
-          <div class="video-info">
-            <h3>Serene Lakeside</h3>
-            <p>Nature B-Roll</p>
-          </div>
+          <div class="video-info"><h3>Serene Lakeside</h3><p>Nature B-Roll</p></div>
         </div>
       </div>
 
       <div class="section-divider reveal"></div>
       <h2 class="g-h2 reveal">Contact</h2>
       <p class="g-p reveal">Available for design projects, brand overhauls, and video edits.</p>
-      <p class="g-p reveal" style="font-weight: bold; color: var(--gd-text); font-family: 'Space Grotesk', sans-serif;">sampagare001@gmail.com</p>
-
+      <p class="g-p reveal" style="font-weight:bold;color:var(--gd-text);font-family:'Space Grotesk',sans-serif;">sampagare001@gmail.com</p>
     </div>
   </div>
 
   <script>
+    /* ─────────────────────────────────────────────────
+       CORE STATE & ELEMENT REFS
+    ───────────────────────────────────────────────── */
     const coverW = document.getElementById('cover-writer');
     const coverG = document.getElementById('cover-gd');
-    const viewW = document.getElementById('view-writer');
-    const viewG = document.getElementById('view-gd');
+    const viewW  = document.getElementById('view-writer');
+    const viewG  = document.getElementById('view-gd');
     const homeBtn = document.getElementById('home-btn');
-    const hub = document.getElementById('hub-container');
-    
-    // Cursors
+    const hub    = document.getElementById('hub-container');
     const curWriter = document.getElementById('cur-writer');
-    const curGd = document.getElementById('cur-gd');
-    const cursorDot = document.getElementById('cursor-dot');
+    const curGd     = document.getElementById('cur-gd');
+    const cursorDot  = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
     const cursor = document.getElementById('cursor');
+    const readProg = document.getElementById('reading-progress');
+    const writerScrollHint = document.getElementById('writer-scroll-hint');
+    const gdScrollHint = document.getElementById('gd-scroll-hint');
 
     let state = 'hub';
+    let mouseX = 0, mouseY = 0;
+    let trailThrottle = 0;
+    let scrollHintHidden = false;
 
-    // Move dynamic cursors
+    /* ─────────────────────────────────────────────────
+       CURSOR TRACKING
+    ───────────────────────────────────────────────── */
     document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top  = e.clientY + 'px';
-      cursorDot.style.left = e.clientX + 'px';
-      cursorDot.style.top  = e.clientY + 'px';
-      
-      if(state === 'hub') {
-        cursorDot.style.background = e.clientX < window.innerWidth / 2 ? '#C9A84C' : '#00E5FF';
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top  = mouseY + 'px';
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top  = mouseY + 'px';
+
+      // Ring lags slightly (handled by CSS transition)
+      cursorRing.style.left = mouseX + 'px';
+      cursorRing.style.top  = mouseY + 'px';
+
+      if (state === 'hub') {
+        const isWriter = mouseX < window.innerWidth / 2;
+        cursorDot.style.background = isWriter ? '#C9A84C' : '#00E5FF';
+        cursorRing.style.borderColor = isWriter ? 'rgba(201,168,76,0.5)' : 'rgba(0,229,255,0.5)';
+      }
+
+      // Cursor trail
+      const now = Date.now();
+      if (now - trailThrottle > 45) {
+        trailThrottle = now;
+        if (state === 'writer') spawnInkDrop(mouseX, mouseY);
+        if (state === 'gd') spawnNeonSpark(mouseX, mouseY);
       }
     });
 
-    // Scroll Reveal Logic
-    const observerOptions = { threshold: 0.1, rootMargin: "0px" };
-    const scrollObserver = new IntersectionObserver((entries) => {
+    // Hover detection for ring expand
+    document.querySelectorAll('a, button, .cover-half, .w-card, .g-card, .video-card, .drive-card').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+
+    /* ─────────────────────────────────────────────────
+       CURSOR TRAILS
+    ───────────────────────────────────────────────── */
+    function spawnInkDrop(x, y) {
+      const d = document.createElement('div');
+      d.className = 'ink-drop';
+      const sz = 6 + Math.random() * 10;
+      d.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;`;
+      document.body.appendChild(d);
+      d.addEventListener('animationend', () => d.remove());
+
+      // Occasional gold star
+      if (Math.random() < 0.06) {
+        const s = document.createElement('div');
+        s.className = 'sparkle-star';
+        s.textContent = '✦';
+        s.style.cssText = `left:${x}px;top:${y}px;`;
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+    }
+
+    function spawnNeonSpark(x, y) {
+      for (let i = 0; i < 2; i++) {
+        const s = document.createElement('div');
+        s.className = 'neon-spark';
+        const tx = (Math.random() - 0.5) * 40;
+        const ty = (Math.random() - 0.5) * 40;
+        s.style.cssText = `left:${x}px;top:${y}px;--tx:${tx}px;--ty:${ty}px;`;
+        s.style.background = Math.random() > 0.5 ? '#00E5FF' : '#FF007A';
+        s.style.boxShadow = `0 0 6px 2px ${Math.random() > 0.5 ? '#00E5FF' : '#FF007A'}`;
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+    }
+
+    /* ─────────────────────────────────────────────────
+       HUB CANVAS — WRITER: INK PARTICLES
+    ───────────────────────────────────────────────── */
+    const wCanvas = document.getElementById('writer-canvas');
+    const wCtx = wCanvas.getContext('2d');
+    let wParticles = [];
+
+    function resizeWCanvas() {
+      wCanvas.width = coverW.offsetWidth;
+      wCanvas.height = coverW.offsetHeight;
+    }
+    resizeWCanvas();
+    window.addEventListener('resize', resizeWCanvas);
+
+    class InkParticle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * wCanvas.width;
+        this.y = wCanvas.height + 20;
+        this.r = 1 + Math.random() * 3;
+        this.vy = -(0.3 + Math.random() * 0.6);
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.alpha = 0;
+        this.maxAlpha = 0.15 + Math.random() * 0.2;
+        this.life = 0; this.maxLife = 120 + Math.random() * 100;
+      }
+      update() {
+        this.life++;
+        this.x += this.vx; this.y += this.vy;
+        if (this.life < 30) this.alpha = (this.life / 30) * this.maxAlpha;
+        else if (this.life > this.maxLife - 30) this.alpha = ((this.maxLife - this.life) / 30) * this.maxAlpha;
+        if (this.life >= this.maxLife) this.reset();
+      }
+      draw() {
+        wCtx.beginPath();
+        wCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        wCtx.fillStyle = `rgba(201,168,76,${this.alpha})`;
+        wCtx.fill();
+      }
+    }
+    for (let i = 0; i < 40; i++) {
+      const p = new InkParticle();
+      p.life = Math.random() * p.maxLife; // Stagger starts
+      wParticles.push(p);
+    }
+
+    function animateWCanvas() {
+      if (state !== 'hub' && state !== 'transitioning') return;
+      wCtx.clearRect(0, 0, wCanvas.width, wCanvas.height);
+      wParticles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateWCanvas);
+    }
+    animateWCanvas();
+
+    /* ─────────────────────────────────────────────────
+       HUB CANVAS — DESIGNER: INTERACTIVE DOT GRID
+    ───────────────────────────────────────────────── */
+    const gCanvas = document.getElementById('gd-canvas');
+    const gCtx = gCanvas.getContext('2d');
+    let gdMouse = { x: -999, y: -999 };
+
+    function resizeGCanvas() {
+      gCanvas.width = coverG.offsetWidth;
+      gCanvas.height = coverG.offsetHeight;
+    }
+    resizeGCanvas();
+    window.addEventListener('resize', resizeGCanvas);
+
+    coverG.addEventListener('mousemove', e => {
+      const r = gCanvas.getBoundingClientRect();
+      gdMouse.x = e.clientX - r.left;
+      gdMouse.y = e.clientY - r.top;
+    });
+    coverG.addEventListener('mouseleave', () => { gdMouse.x = -999; gdMouse.y = -999; });
+
+    function animateGCanvas() {
+      if (state !== 'hub' && state !== 'transitioning') return;
+      gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+      const spacing = 35;
+      for (let x = spacing; x < gCanvas.width; x += spacing) {
+        for (let y = spacing; y < gCanvas.height; y += spacing) {
+          const dx = x - gdMouse.x, dy = y - gdMouse.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          const maxDist = 120;
+          let r = 1.5, alpha = 0.12, color = '17,17,22';
+          if (dist < maxDist) {
+            const t = 1 - dist / maxDist;
+            r = 1.5 + t * 4;
+            alpha = 0.12 + t * 0.6;
+            color = t > 0.5 ? '0,229,255' : '111,111,111';
+          }
+          gCtx.beginPath();
+          gCtx.arc(x, y, r, 0, Math.PI * 2);
+          gCtx.fillStyle = `rgba(${color},${alpha})`;
+          gCtx.fill();
+        }
+      }
+      requestAnimationFrame(animateGCanvas);
+    }
+    animateGCanvas();
+
+    /* ─────────────────────────────────────────────────
+       DESIGNER DOT CANVAS (INNER VIEW)
+    ───────────────────────────────────────────────── */
+    const gdDotCanvas = document.getElementById('gd-dot-canvas');
+    const gdDotCtx = gdDotCanvas.getContext('2d');
+    let gdInnerMouse = { x: -999, y: -999 };
+    let gdDotAnim = null;
+
+    function resizeGdDotCanvas() {
+      gdDotCanvas.width = window.innerWidth;
+      gdDotCanvas.height = window.innerHeight;
+      gdDotCanvas.style.position = 'fixed';
+      gdDotCanvas.style.inset = '0';
+      gdDotCanvas.style.width = '100%';
+      gdDotCanvas.style.height = '100%';
+      gdDotCanvas.style.zIndex = '0';
+      gdDotCanvas.style.pointerEvents = 'none';
+    }
+    resizeGdDotCanvas();
+    window.addEventListener('resize', resizeGdDotCanvas);
+
+    viewG.addEventListener('mousemove', e => { gdInnerMouse.x = e.clientX; gdInnerMouse.y = e.clientY; });
+
+    function animateGdDotCanvas() {
+      gdDotCtx.clearRect(0, 0, gdDotCanvas.width, gdDotCanvas.height);
+      const sp = 40;
+      for (let x = sp; x < gdDotCanvas.width; x += sp) {
+        for (let y = sp; y < gdDotCanvas.height; y += sp) {
+          const dx = x - gdInnerMouse.x, dy = y - gdInnerMouse.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          const maxD = 150;
+          let r = 1, alpha = 0.07;
+          if (dist < maxD) {
+            const t = 1 - dist / maxD;
+            r = 1 + t * 3.5; alpha = 0.07 + t * 0.3;
+          }
+          gdDotCtx.beginPath();
+          gdDotCtx.arc(x, y, r, 0, Math.PI * 2);
+          gdDotCtx.fillStyle = `rgba(0,229,255,${alpha})`;
+          gdDotCtx.fill();
+        }
+      }
+      gdDotAnim = requestAnimationFrame(animateGdDotCanvas);
+    }
+
+    /* ─────────────────────────────────────────────────
+       CLICK RIPPLE ON HUB
+    ───────────────────────────────────────────────── */
+    function spawnRipple(parent, x, y, cls) {
+      const el = document.createElement('div');
+      el.className = `click-ripple ${cls}`;
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+      parent.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+
+    /* ─────────────────────────────────────────────────
+       SCROLL REVEAL
+    ───────────────────────────────────────────────── */
+    const scrollObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
+          // Animate w-h2 underline
+          if (entry.target.classList.contains('w-h2') || entry.target.classList.contains('g-h2')) {
+            entry.target.classList.add('visible');
+          }
         }
       });
-    }, observerOptions);
+    }, { threshold: 0.12, rootMargin: '0px' });
 
-    // Open Main Domains
-    function openPortfolio(side) {
-      if(state !== 'hub') return;
-      state = side;
+    /* ─────────────────────────────────────────────────
+       3D CARD TILT
+    ───────────────────────────────────────────────── */
+    function initTilt(selector) {
+      document.querySelectorAll(selector).forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = `perspective(900px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateZ(16px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(900px) rotateY(0) rotateX(0) translateZ(0)';
+          card.style.transition = 'transform 0.5s var(--ease)';
+        });
+        card.addEventListener('mouseenter', () => { card.style.transition = 'none'; });
+      });
+    }
+
+    /* ─────────────────────────────────────────────────
+       READING PROGRESS
+    ───────────────────────────────────────────────── */
+    function updateReadingProgress(scrollEl) {
+      const scrollTop = scrollEl.scrollTop;
+      const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
+      const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      readProg.style.width = pct + '%';
+    }
+
+    /* ─────────────────────────────────────────────────
+       TYPEWRITER
+    ───────────────────────────────────────────────── */
+    function typewriterEffect(el, text, speed = 55) {
+      el.textContent = '';
+      const cursor = document.getElementById('tw-cursor');
+      if (cursor) cursor.style.display = 'inline-block';
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          el.textContent = text.slice(0, ++i);
+        } else {
+          clearInterval(interval);
+          if (cursor) {
+            setTimeout(() => { cursor.style.display = 'none'; }, 1800);
+          }
+        }
+      }, speed);
+    }
+
+    /* ─────────────────────────────────────────────────
+       SCROLL HINT
+    ───────────────────────────────────────────────── */
+    function showScrollHint(hintEl) {
+      scrollHintHidden = false;
+      setTimeout(() => { if (!scrollHintHidden) hintEl.classList.add('show'); }, 1600);
+    }
+    function hideScrollHint(hintEl) {
+      scrollHintHidden = true;
+      hintEl.classList.remove('show');
+      hintEl.classList.add('hide');
+    }
+
+    /* ─────────────────────────────────────────────────
+       OPEN PORTFOLIO
+    ───────────────────────────────────────────────── */
+    function openPortfolio(side, event) {
+      if (state !== 'hub') return;
+      state = 'transitioning';
+
+      // Ripple
+      if (event) {
+        const parentEl = side === 'writer' ? coverW : coverG;
+        const rect = parentEl.getBoundingClientRect();
+        spawnRipple(parentEl, event.clientX - rect.left, event.clientY - rect.top,
+                    side === 'writer' ? 'ripple-writer' : 'ripple-gd');
+      }
+
       hub.style.pointerEvents = 'none';
 
-      if(side === 'writer') {
-        coverG.style.width = '0';
-        coverW.style.width = '100vw';
-        
-        // Setup Writer Cursor
-        curWriter.style.opacity = '1';
-        cursorDot.style.opacity = '0';
+      if (side === 'writer') {
+        state = 'writer';
+        coverG.style.width = '0'; coverW.style.width = '100vw';
+        curWriter.style.opacity = '1'; cursorDot.style.opacity = '0';
+        cursorRing.style.borderColor = 'rgba(201,168,76,0.4)';
 
         setTimeout(() => {
           coverW.style.opacity = '0';
-          viewW.classList.add('active');
-          document.querySelectorAll('#view-writer .reveal').forEach(el => scrollObserver.observe(el));
-        }, 800);
+          viewW.classList.add('active', 'entering');
+          homeBtn.classList.add('visible', 'writer-mode');
+
+          // Init scroll observer
+          document.querySelectorAll('#view-writer .reveal, #view-writer .w-h2, #view-writer .g-h2').forEach(el => scrollObserver.observe(el));
+
+          // Tilt
+          initTilt('#view-writer .w-card');
+
+          // Typewriter on h1
+          const h1 = document.querySelector('#main-writer-content .w-h1');
+          if (h1) setTimeout(() => typewriterEffect(h1, 'Shamshon Pagare', 60), 200);
+
+          // Reading progress
+          viewW.addEventListener('scroll', () => {
+            updateReadingProgress(viewW);
+            if (viewW.scrollTop > 80) hideScrollHint(writerScrollHint);
+          });
+          readProg.className = 'rp-writer';
+          showScrollHint(writerScrollHint);
+
+          setTimeout(() => viewW.classList.remove('entering'), 1000);
+        }, 750);
 
       } else {
-        coverW.style.width = '0';
-        coverG.style.width = '100vw';
-        
-        // Setup GD Cursor
-        curGd.style.opacity = '1';
-        cursorDot.style.opacity = '0';
+        state = 'gd';
+        coverW.style.width = '0'; coverG.style.width = '100vw';
+        curGd.style.opacity = '1'; cursorDot.style.opacity = '0';
+        cursorRing.style.borderColor = 'rgba(0,229,255,0.4)';
 
         setTimeout(() => {
           coverG.style.opacity = '0';
-          viewG.classList.add('active');
-          document.querySelectorAll('#view-gd .reveal').forEach(el => scrollObserver.observe(el));
-        }, 800);
+          viewG.classList.add('active', 'entering');
+          homeBtn.classList.add('visible');
+          homeBtn.classList.remove('writer-mode');
+
+          document.querySelectorAll('#view-gd .reveal, #view-gd .g-h2').forEach(el => scrollObserver.observe(el));
+          initTilt('#view-gd .g-card');
+          initTilt('#view-gd .video-card');
+
+          // Start dot canvas
+          animateGdDotCanvas();
+
+          viewG.addEventListener('scroll', () => {
+            updateReadingProgress(viewG);
+            if (viewG.scrollTop > 80) hideScrollHint(gdScrollHint);
+          });
+          readProg.className = 'rp-gd';
+          showScrollHint(gdScrollHint);
+
+          setTimeout(() => viewG.classList.remove('entering'), 1000);
+        }, 750);
       }
 
       setTimeout(() => { homeBtn.classList.add('visible'); }, 1200);
     }
 
-    // Reset back to split-screen Hub
+    /* ─────────────────────────────────────────────────
+       RESET TO HUB
+    ───────────────────────────────────────────────── */
     function resetToHub(e) {
       e.preventDefault();
+      const wasState = state;
       state = 'hub';
-      homeBtn.classList.remove('visible');
-      
-      // Ensure modals are closed
+
+      homeBtn.classList.remove('visible', 'writer-mode');
       closeModal('poems-modal');
       closeModal('articles-modal');
-      
+
       viewW.classList.remove('active');
       viewG.classList.remove('active');
-      
-      coverW.style.opacity = '1';
-      coverG.style.opacity = '1';
-      
+      coverW.style.opacity = '1'; coverG.style.opacity = '1';
+
+      // Stop GD dot canvas
+      if (gdDotAnim) { cancelAnimationFrame(gdDotAnim); gdDotAnim = null; }
+      gdDotCtx.clearRect(0, 0, gdDotCanvas.width, gdDotCanvas.height);
+
+      readProg.style.width = '0%';
+
       setTimeout(() => {
-        coverW.style.width = '50vw';
-        coverG.style.width = '50vw';
+        coverW.style.width = '50vw'; coverG.style.width = '50vw';
         hub.style.pointerEvents = 'auto';
-        
-        // Reset Cursors
-        curWriter.style.opacity = '0';
-        curGd.style.opacity = '0';
+        curWriter.style.opacity = '0'; curGd.style.opacity = '0';
         cursorDot.style.opacity = '1';
-        
+        cursorRing.style.borderColor = 'rgba(255,255,255,0.3)';
+
         document.querySelectorAll('.reveal').forEach(el => {
-            el.classList.remove('visible');
-            scrollObserver.unobserve(el);
+          el.classList.remove('visible');
+          scrollObserver.unobserve(el);
         });
+
+        // Restart hub canvases
+        animateWCanvas();
+        animateGCanvas();
       }, 500);
     }
 
-    // Dynamic Modal Logic (With Scroll Fix)
-    function openModal(modalId) {
-      const modal = document.getElementById(modalId);
-      
-      // Fix: Instantly scroll the parent writer view to the absolute top 
-      // so the new overlay page begins perfectly at the top edge.
+    /* ─────────────────────────────────────────────────
+       MODAL LOGIC
+    ───────────────────────────────────────────────── */
+    function openModal(id) {
+      const modal = document.getElementById(id);
       document.getElementById('view-writer').scrollTop = 0;
-      
       modal.style.display = 'block';
       setTimeout(() => {
         modal.classList.add('open');
         homeBtn.style.display = 'none';
+
+        // Stagger poem/article reveals
+        if (id === 'poems-modal') {
+          document.querySelectorAll('#poems-modal .poem-block.poem-reveal').forEach((el, i) => {
+            setTimeout(() => el.classList.add('visible'), 200 + i * 120);
+          });
+        }
+
+        // Reading progress for modal scroll
+        modal.addEventListener('scroll', () => {
+          const pct = modal.scrollHeight > modal.clientHeight
+            ? (modal.scrollTop / (modal.scrollHeight - modal.clientHeight)) * 100 : 0;
+          readProg.style.width = pct + '%';
+        });
       }, 10);
     }
 
-    function closeModal(modalId) {
-      const modal = document.getElementById(modalId);
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
       modal.classList.remove('open');
+      // Reset poem visible
+      document.querySelectorAll(`#${id} .poem-block.poem-reveal`).forEach(el => el.classList.remove('visible'));
       setTimeout(() => {
         modal.style.display = 'none';
         homeBtn.style.display = 'block';
-      }, 600);
+      }, 650);
     }
+
+    /* ─────────────────────────────────────────────────
+       MAGNETIC BUTTONS
+    ───────────────────────────────────────────────── */
+    function initMagnetic(sel) {
+      document.querySelectorAll(sel).forEach(el => {
+        el.addEventListener('mousemove', e => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - r.left - r.width / 2) * 0.25;
+          const y = (e.clientY - r.top - r.height / 2) * 0.25;
+          el.style.transform = `translate(${x}px, ${y}px)`;
+          el.style.transition = 'transform 0.1s';
+        });
+        el.addEventListener('mouseleave', () => {
+          el.style.transform = 'translate(0, 0)';
+          el.style.transition = 'transform 0.5s var(--ease-back)';
+        });
+      });
+    }
+    initMagnetic('.read-btn');
+    initMagnetic('.modal-close-btn');
+
+    /* ─────────────────────────────────────────────────
+       SPLASH CLEANUP
+    ───────────────────────────────────────────────── */
+    setTimeout(() => {
+      const splash = document.getElementById('intro-splash');
+      if (splash) splash.remove();
+      // Restart canvases after splash
+    }, 3000);
 
   </script>
 </body>
